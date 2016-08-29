@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- This file is part of Tryton.  The COPYRIGHT file at the top level of
+this repository contains the full copyright notices and license terms. -->
+<data>
+    <xpath
+        expr="/form/notebook/page[@id='accounting']/separator[@id='account']"
+        position="before">
+        <separator string="Payment Method" colspan="4" id="payment_method"/>
+        <label name="customer_paymode"/>
+        <field name="customer_paymode"/>
+        <label name="supplier_paymode"/>
+        <field name="supplier_paymode"/>
+    </xpath>
+</data>

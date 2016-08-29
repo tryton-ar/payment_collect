@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<form string="Transaction">
+    <label name="collect_result" />
+    <field name="collect_result" />
+    <label name="collect" />
+    <field name="collect" />
+    <label name="invoice" />
+    <field name="invoice" />
+    <notebook colspan="4">
+        <page string="Mensaje" id='mensaje'>
+            <field name="collect_message" />
+        </page>
+        <page string="Party" id='party'>
+            <label name="party" />
+            <field name="party" />
+            <label name="phone" />
+            <field name="phone" />
+            <label name="email" />
+            <field name="email" />
+        </page>
+    </notebook>
+</form>

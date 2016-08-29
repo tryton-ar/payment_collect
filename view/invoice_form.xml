@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<data>
+    <xpath expr="/form/notebook/page[@id='invoice']" position="replace_attributes">
+        <page string="Invoice" id="invoice" col="4" />
+    </xpath>
+    <xpath expr="/form/notebook/page[@id='invoice']/field[@name='invoice_date']" position="after">
+        <label name="paymode"/>
+        <field name="paymode"/>
+    </xpath>
+    <xpath expr="/form/notebook/page[@id='payment']" position="after">
+        <page string="Collect Transactions" id="collect_transactions">
+            <field name="collect_transactions" colspan="4"/>
+        </page>
+    </xpath>
+</data>

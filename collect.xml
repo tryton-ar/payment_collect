@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!-- This file is part of Tryton.  The COPYRIGHT file at the top level of
+this repository contains the full copyright notices and license terms. -->
+<tryton>
+    <data>
+
+        <record model="ir.ui.view" id="collect_view_form">
+            <field name="model">payment.collect</field>
+            <field name="type">form</field>
+            <field name="name">collect_form</field>
+        </record>
+
+        <record model="ir.ui.view" id="collect_view_tree">
+            <field name="model">payment.collect</field>
+            <field name="type">tree</field>
+            <field name="name">collect_tree</field>
+        </record>
+
+        <!-- Payment Collect -->
+        <record model="ir.action.act_window" id="act_payment_collect_form">
+            <field name="name">Payment Collect</field>
+            <field name="res_model">payment.collect</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_payment_collect_form_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="collect_view_tree"/>
+            <field name="act_window" ref="act_payment_collect_form"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_payment_collect_form_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="collect_view_form"/>
+            <field name="act_window" ref="act_payment_collect_form"/>
+        </record>
+
+        <!-- Wizard Collect -->
+        <record model="ir.action.wizard" id="wizard_collect_send">
+            <field name="name">Collect send</field>
+            <field name="wiz_name">payment.collect.send</field>
+        </record>
+        <record model="ir.ui.view" id="collect_send_start_view">
+            <field name="model">payment.collect.send.start</field>
+            <field name="type">form</field>
+            <field name="name">collect_send_start_view</field>
+        </record>
+
+        <!-- Wizard Return Collect -->
+        <record model="ir.action.wizard" id="wizard_collect_return">
+            <field name="name">Collect return</field>
+            <field name="wiz_name">payment.collect.return</field>
+        </record>
+        <record model="ir.ui.view" id="collect_return_start_view">
+            <field name="model">payment.collect.return.start</field>
+            <field name="type">form</field>
+            <field name="name">collect_return_start_view</field>
+        </record>
+
+        <!-- Wizard Message Form -->
+        <record model="ir.ui.view" id="collect_wizard_message_view">
+            <field name="model">payment.collect.wizard.message</field>
+            <field name="type">form</field>
+            <field name="name">collect_wizard_message_view</field>
+        </record>
+
+        <menuitem name="Payment Collect" parent="account.menu_account"
+            id="menu_account_payment_collect" sequence="40"/>
+        <menuitem parent="menu_account_payment_collect" action="act_payment_collect_form"
+            id="menu_account_payment_collect_form" sequence="10"/>
+        <menuitem parent="menu_account_payment_collect" action="wizard_collect_send"
+            id="menu_account_payment_collect_send" icon="tryton-print"/>
+        <menuitem parent="menu_account_payment_collect" action="wizard_collect_return"
+            id="menu_account_payment_collect_return" icon="tryton-print"/>
+
+
+    </data>
+</tryton>

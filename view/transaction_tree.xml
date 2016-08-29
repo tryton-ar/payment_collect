@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<tree string="Transaction">
+    <field name="invoice" />
+    <field name="invoice_state" />
+    <field name="party" />
+    <field name="phone" />
+    <field name="email" />
+    <field name="amount" />
+    <field name="collect_result" />
+    <field name="collect_message" />
+</tree>
