@@ -18,7 +18,6 @@ class PayMode(ModelSQL, ModelView):
     'Pay Mode'
     __name__ = 'payment.paymode'
 
-    type = fields.Selection('get_types', 'Pay Mode')
     party = fields.Many2One('party.party', 'Party', ondelete='CASCADE',
         required=True, select=True)
     type = fields.Selection('get_types', 'Type')
@@ -46,8 +45,8 @@ class PayMode(ModelSQL, ModelView):
     #party = fields.Many2One('party.party', 'Party')
 
     def get_rec_name(self, name):
-        if self.paymode and self.party:
-            return '['+self.paymode+'] '+self.party.name
+        if self.type and self.party:
+            return '['+self.type+'] '+self.party.name
         else:
             return self.name
 
