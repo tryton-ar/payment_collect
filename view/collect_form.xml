@@ -2,22 +2,16 @@
 <!-- This file is part of Tryton.  The COPYRIGHT file at the top level of
      this repository contains the full copyright notices and license terms. -->
 <form string="Collect">
-    <label name="rec_name"/>
-    <field name="rec_name"/>
+    <label name="paymode_type"/>
+    <field name="paymode_type"/>
+    <label name="period"/>
+    <field name="period"/>
     <label name="type"/>
     <field name="type"/>
-    <label name="collect_type"/>
-    <field name="collect_type"/>
-    <newline />
     <label name="cantidad_registros"/>
     <field name="cantidad_registros"/>
     <label name="monto_total"/>
     <field name="monto_total"/>
-    <newline/>
-    <label name="start_date"/>
-    <field name="start_date"/>
-    <label name="end_date"/>
-    <field name="end_date"/>
     <field name="attachments" colspan="4"/>
     <newline/>
     <field name="transactions_accepted" colspan="4"/>

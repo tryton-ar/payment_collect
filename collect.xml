@@ -54,13 +54,6 @@ this repository contains the full copyright notices and license terms. -->
             <field name="name">collect_return_start_view</field>
         </record>
 
-        <!-- Wizard Message Form -->
-        <record model="ir.ui.view" id="collect_wizard_message_view">
-            <field name="model">payment.collect.wizard.message</field>
-            <field name="type">form</field>
-            <field name="name">collect_wizard_message_view</field>
-        </record>
-
         <menuitem name="Payment Collect" parent="account.menu_account"
             id="menu_account_payment_collect" sequence="40"/>
         <menuitem parent="menu_account_payment_collect" action="act_payment_collect_form"
@@ -69,7 +62,6 @@ this repository contains the full copyright notices and license terms. -->
             id="menu_account_payment_collect_send" icon="tryton-print"/>
         <menuitem parent="menu_account_payment_collect" action="wizard_collect_return"
             id="menu_account_payment_collect_return" icon="tryton-print"/>
-
 
     </data>
 </tryton>
