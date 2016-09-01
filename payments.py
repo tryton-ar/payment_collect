@@ -12,6 +12,7 @@ import datetime
 class Payments:
 
     _EOL = '\r\n'
+    _SEPARATOR = ';'
     csv_format = False
     monto_total = Decimal('0')
     cantidad_registros = 0
@@ -32,11 +33,11 @@ class Payments:
         attach = Attachment()
         attach.name = filename + '.txt'
         attach.resource = collect
-        attach.data = self.res.pop()
+        attach.data = ''.join(self.res)
         attach.save()
 
     def get_domain(self):
-        invoice_type = ['out_invoice']
+        invoice_type = ['out_invoice', 'out_credit_note']
 
         domain = [
             ('state', 'in', ['posted']),
@@ -63,7 +64,7 @@ class Payments:
         """
         campos = self.lista_campo_ordenados()
         campos = [x for x in campos if x != '']
-        separador = csv_format and ';' or ''
+        separador = csv_format and self._SEPARATOR or ''
         return separador.join(campos) + self._EOL
 
     def message_invoice(self, invoice, collect_result, message):

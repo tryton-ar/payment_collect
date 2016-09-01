@@ -16,7 +16,6 @@ def register():
         CollectSendStart,
         CollectReturnStart,
         CollectTransaction,
-        CollectMessage,
         Invoice,
         module='payment_collect', type_='model')
     Pool.register(

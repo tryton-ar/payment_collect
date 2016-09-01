@@ -1,16 +1,11 @@
 <?xml version="1.0"?>
 <!-- This file is part of Tryton.  The COPYRIGHT file at the top level of
 this repository contains the full copyright notices and license terms. -->
-<form string="Collect send">
-    <label name="collect_type"/>
-    <field name="collect_type"/>
-    <label name="credit_paymode"/>
-    <field name="credit_paymode" widget="selection"/>
+<form string="Collect return">
+    <label name="paymode_type"/>
+    <field name="paymode_type"/>
+    <label name="period"/>
+    <field name="period"/>
     <label name="return_file"/>
     <field name="return_file"/>
-    <newline />
-    <label name="start_date"/>
-    <field name="start_date"/>
-    <label name="end_date"/>
-    <field name="end_date"/>
 </form>

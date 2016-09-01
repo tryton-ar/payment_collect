@@ -73,6 +73,8 @@ class CollectSendStart(ModelView):
     'Collect Send Start'
     __name__ = 'payment.collect.send.start'
 
+    csv_format = fields.Boolean('CSV format',
+        help='Check this box if you want export to csv format.')
     period = fields.Many2One('account.period', 'Period', required=True)
     paymode_type = fields.Selection('get_types', 'Pay Mode')
 
