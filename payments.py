@@ -17,18 +17,12 @@ class Payments:
     monto_total = Decimal('0')
     cantidad_registros = 0
     paymode_type = res = period = type = None
+    journal = 'CASH'
 
     def attach_collect(self):
         pool = Pool()
-        Collect = pool.get('payment.collect')
         Attachment = pool.get('ir.attachment')
-        collect = Collect()
-        collect.monto_total = self.monto_total
-        collect.cantidad_registros = self.cantidad_registros
-        collect.period = self.period
-        collect.paymode_type = self.paymode_type
-        collect.type = self.type
-        collect.save()
+        collect = self._collect()
         filename = collect.paymode_type + '-' + self.type + '-' + datetime.date.today().strftime("%Y-%m-%d")
         attach = Attachment()
         attach.name = filename + '.txt'
@@ -79,7 +73,7 @@ class Payments:
         return transaction
 
     def pay_invoice(self, invoice):
-        logger.info("PAY INVOICE: invoice_id="+repr(invoice.number))
+        logger.info("PAY INVOICE: invoice_id: "+repr(invoice.number))
         # Pagar la invoice
         pool = Pool()
         Currency = pool.get('currency.currency')
@@ -96,7 +90,7 @@ class Payments:
             second_currency = invoice.currency
 
         line = None
-        pay_journal = Journal.search(['code', '=', 'VA'])[0]
+        pay_journal, = Journal.search(['code', '=', self.journal])
         if not invoice.company.currency.is_zero(amount):
             line = invoice.pay_invoice(amount,
                                        pay_journal, invoice.invoice_date,
@@ -109,21 +103,25 @@ class Payments:
             MoveLine.reconcile(reconcile_lines)
         # Fin pagar invoice
 
+    def _collect(self):
+        pool = Pool()
+        Collect = pool.get('payment.collect')
+        collect = Collect()
+        collect.monto_total = self.monto_total
+        collect.cantidad_registros = self.cantidad_registros
+        collect.period = self.period
+        collect.paymode_type = self.paymode_type
+        collect.type = self.type
+        collect.save()
+        return collect
+
     def _add_attach_to_collect(self, collect, return_file):
         Attachment = Pool().get('ir.attachment')
         return_file.seek(0)
         attach = Attachment()
-        filename = self.start.collect_type
-        if self.start.credit_paymode:
-            filename = self.start.collect_type + '-' + self.start.credit_paymode.name.lower()
-        filename = filename + '-' + datetime.date.today().strftime("%Y-%m-%d")
-        attach.name = filename
+        filename = collect.paymode_type + '-' + self.type + '-' + datetime.date.today().strftime("%Y-%m-%d")
+        attach = Attachment()
+        attach.name = filename + '.txt'
         attach.resource = collect
         attach.data = return_file.read()
         attach.save()
-
-class banco_credicoop(Payments):
-
-    def generate_collect(self):
-        logger.info("generate_collect: banco_credicoop")
-        pass
