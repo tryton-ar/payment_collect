@@ -77,11 +77,15 @@ class Payments:
         # Pagar la invoice
         pool = Pool()
         Currency = pool.get('currency.currency')
+        Configuration = pool.get('account.configuration')
         Journal = pool.get('account.journal')
         MoveLine = pool.get('account.move.line')
         amount = Currency.compute(invoice.currency, invoice.amount_to_pay, invoice.company.currency)
         reconcile_lines, remainder = \
             invoice.get_reconcile_lines_for_amount(amount)
+        config = Configuration(1)
+        if config.payment_collect_journal:
+            self.journal = config.payment_collect_journal
 
         amount_second_currency = None
         second_currency = None

@@ -6,6 +6,7 @@ from .paymode import *
 from .collect import *
 from .invoice import *
 from .party import *
+from .configuration import *
 
 
 def register():
@@ -17,6 +18,7 @@ def register():
         CollectReturnStart,
         CollectTransaction,
         Invoice,
+        Configuration,
         module='payment_collect', type_='model')
     Pool.register(
         CollectSend,
