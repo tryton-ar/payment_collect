@@ -3,8 +3,9 @@
 # this repository contains the full copyright notices and license terms.
 
 from trytond.model import fields, ModelSQL, ModelView
-from trytond.pool import PoolMeta
+from trytond.pool import PoolMeta, Pool
 from trytond.pyson import Eval
+from trytond.transaction import Transaction
 
 __all__ = ['Invoice', 'CollectTransaction']
 __metaclass__ = PoolMeta
@@ -80,3 +81,33 @@ class Invoice:
         super(Invoice, self).on_change_party()
         self.paymode = None
         self.__get_paymode()
+
+    @classmethod
+    def compute_default_paymode(cls, values):
+        pool = Pool()
+        Party = pool.get('party.party')
+        Company = pool.get('company.company')
+
+        payment_type = values.get('payment_type')
+        party = values.get('party')
+        _type = values.get('type')
+        company = values.get('company', Transaction().context.get('company'))
+
+        changes = {}
+        if not payment_type and party and _type and company:
+            invoice = cls()
+            invoice.party = Party(party)
+            invoice.type = _type
+            invoice.company = Company(company)
+            invoice.payment_type = None
+            invoice.__get_paymode()
+            changes['paymode'] = invoice.paymode
+
+        return changes
+
+    @classmethod
+    def create(cls, vlist):
+        vlist = [x.copy() for x in vlist]
+        for values in vlist:
+            values.update(cls.compute_default_paymode(values))
+        return super(Invoice, cls).create(vlist)
