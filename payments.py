@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 from trytond.pool import Pool
 from decimal import Decimal
 import datetime
+from trytond.transaction import Transaction
 
 class Payments:
 
@@ -72,39 +73,48 @@ class Payments:
         transaction.save()
         return transaction
 
-    def pay_invoice(self, invoice):
+    def pay_invoice(self, invoice, amount_to_pay):
         logger.info("PAY INVOICE: invoice_id: "+repr(invoice.number))
         # Pagar la invoice
         pool = Pool()
         Currency = pool.get('currency.currency')
         Configuration = pool.get('account.configuration')
-        Journal = pool.get('account.journal')
         MoveLine = pool.get('account.move.line')
-        amount = Currency.compute(invoice.currency, invoice.amount_to_pay, invoice.company.currency)
+
+        with Transaction().set_context(date=datetime.date.today()):
+            amount = Currency.compute(invoice.currency,
+                amount_to_pay, invoice.company.currency)
+
+        if invoice.type in ('in_invoice', 'out_credit_note'):
+            amount = -amount
+
         reconcile_lines, remainder = \
             invoice.get_reconcile_lines_for_amount(amount)
+
         config = Configuration(1)
-        if config.payment_collect_journal:
-            self.journal = config.payment_collect_journal
 
         amount_second_currency = None
         second_currency = None
         if invoice.currency != invoice.company.currency:
-            amount_second_currency = invoice.amount_to_pay
+            amount_second_currency = amount_to_pay
             second_currency = invoice.currency
 
         line = None
-        pay_journal, = Journal.search(['code', '=', self.journal])
+        pay_journal = None
+        if config.payment_collect_journal:
+            pay_journal = config.payment_collect_journal
         if not invoice.company.currency.is_zero(amount):
             line = invoice.pay_invoice(amount,
                                        pay_journal, invoice.invoice_date,
                                        invoice.number, amount_second_currency,
                                        second_currency)
-
-        if line:
-            reconcile_lines += [line]
-        if reconcile_lines:
-            MoveLine.reconcile(reconcile_lines)
+        if remainder != Decimal('0.0'):
+            return
+        else:
+            if line:
+                reconcile_lines += [line]
+            if reconcile_lines:
+                MoveLine.reconcile(reconcile_lines)
         # Fin pagar invoice
 
     def _collect(self):
