@@ -73,15 +73,19 @@ class Payments:
         transaction.save()
         return transaction
 
-    def pay_invoice(self, invoice, amount_to_pay):
+    def pay_invoice(self, invoice, amount_to_pay, pay_date=None):
         logger.info("PAY INVOICE: invoice_id: "+repr(invoice.number))
         # Pagar la invoice
         pool = Pool()
         Currency = pool.get('currency.currency')
         Configuration = pool.get('account.configuration')
         MoveLine = pool.get('account.move.line')
+        Date = Pool().get('ir.date')
 
-        with Transaction().set_context(date=datetime.date.today()):
+        if pay_date is None:
+            pay_date = Date.today()
+
+        with Transaction().set_context(date=pay_date):
             amount = Currency.compute(invoice.currency,
                 amount_to_pay, invoice.company.currency)
 
@@ -105,7 +109,7 @@ class Payments:
             pay_journal = config.payment_collect_journal
         if not invoice.company.currency.is_zero(amount):
             line = invoice.pay_invoice(amount,
-                                       pay_journal, invoice.invoice_date,
+                                       pay_journal, pay_date,
                                        invoice.number, amount_second_currency,
                                        second_currency)
         if remainder != Decimal('0.0'):

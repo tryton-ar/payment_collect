@@ -44,8 +44,8 @@ class Collect(ModelSQL, ModelView):
         return paymode.get_types()
 
     def get_rec_name(self, name):
-        if self.period and self.paymode_type:
-            name = '[' + self.paymode_type + '] ' + self.period.rec_name
+        if self.paymode_type:
+            name = self.paymode_type
         return name
 
     def get_transactions_accepted(self, name):
@@ -106,9 +106,9 @@ class CollectReturnStart(ModelView):
     'Collect Return Start'
     __name__ = 'payment.collect.return.start'
 
-    period = fields.Many2One('account.period', 'Period', required=True)
     paymode_type = fields.Selection('get_types', 'Pay Mode')
     return_file = fields.Binary('Return File')
+    pay_date = fields.Date('Pay date')
 
     @classmethod
     def get_types(cls):

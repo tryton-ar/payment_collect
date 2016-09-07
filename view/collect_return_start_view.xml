@@ -4,8 +4,9 @@ this repository contains the full copyright notices and license terms. -->
 <form string="Collect return">
     <label name="paymode_type"/>
     <field name="paymode_type"/>
-    <label name="period"/>
-    <field name="period"/>
+    <newline />
     <label name="return_file"/>
     <field name="return_file"/>
+    <label name="pay_date"/>
+    <field name="pay_date"/>
 </form>
