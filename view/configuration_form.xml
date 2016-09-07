@@ -5,8 +5,8 @@ this repository contains the full copyright notices and license terms. -->
     <xpath expr="/form"
         position="inside">
         <separator id="payment_collect" string="Payment Collect" colspan="4"/>
-        <label name="payment_collect_journal"/>
-        <field name="payment_collect_journal"/>
+        <label name="default_payment_collect_journal"/>
+        <field name="default_payment_collect_journal"/>
         <newline/>
     </xpath>
 </data>

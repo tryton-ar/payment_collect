@@ -9,5 +9,5 @@ __metaclass__ = PoolMeta
 
 class Configuration:
     __name__ = 'account.configuration'
-    payment_collect_journal = fields.Property(
+    default_payment_collect_journal = fields.Property(
         fields.Many2One('account.journal', 'Payment Journal'))
