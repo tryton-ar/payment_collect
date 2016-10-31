@@ -63,7 +63,7 @@ class Invoice:
         'payment.paymode',
         'Pay mode', domain=[('party', '=', Eval('party'))], states={
             'readonly': Eval('state') != 'draft',
-            'invisible': Eval('type').in_(['in_credit_note', 'out_credit_note']),
+            'invisible': Eval('type').in_(['in', 'out']),
         }, depends=['party', 'type', 'state'])
 
     def __get_paymode(self):
@@ -71,9 +71,9 @@ class Invoice:
         Return a pay mode.
         '''
         if self.party:
-            if (self.type == 'out_invoice' and self.party.customer_paymode):
+            if (self.type == 'out' and self.party.customer_paymode):
                 self.paymode = self.party.customer_paymode
-            if (self.type == 'in_invoice' and self.party.supplier_paymode):
+            if (self.type == 'in' and self.party.supplier_paymode):
                 self.paymode = self.party.supplier_paymode
 
     @fields.depends('party', 'payment_term', 'type', 'company', 'paymode')
