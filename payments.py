@@ -89,8 +89,9 @@ class Payments:
             amount = Currency.compute(invoice.currency,
                 amount_to_pay, invoice.company.currency)
 
-        if invoice.type in ('in_invoice', 'out_credit_note'):
-            amount = -amount
+        # FIXME migrate 4.0?
+        #if invoice.type in ('in_invoice', 'out_credit_note'):
+        #    amount = -amount
 
         reconcile_lines, remainder = \
             invoice.get_reconcile_lines_for_amount(amount)
