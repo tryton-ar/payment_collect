@@ -6,11 +6,15 @@
 import logging
 logger = logging.getLogger(__name__)
 from trytond.pool import Pool
+from trytond.model import ModelStorage
 from decimal import Decimal
 import datetime
 from trytond.transaction import Transaction
 
-class Payments:
+class Payments(ModelStorage):
+    'Payments'
+    __name__ = 'payment.paymode.payments'
+
 
     _EOL = '\r\n'
     _SEPARATOR = ';'
@@ -31,14 +35,15 @@ class Payments:
         attach.data = ''.join(self.res)
         attach.save()
 
-    def get_domain(self):
+    @classmethod
+    def get_domain(cls, period):
         invoice_type = ['out_invoice', 'out_credit_note']
 
         domain = [
             ('state', 'in', ['posted']),
             ('type', 'in', invoice_type),
-            ('invoice_date', '>=', self.period.start_date),
-            ('invoice_date', '<=', self.period.end_date),
+            ('invoice_date', '>=', period.start_date),
+            ('invoice_date', '<=', period.end_date),
             ]
 
         return domain
