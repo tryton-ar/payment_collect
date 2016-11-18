@@ -6,12 +6,7 @@ from trytond.wizard import Wizard, StateView, StateTransition, Button
 from trytond.model import fields, ModelSQL, ModelView
 from trytond.pool import Pool, PoolMeta
 import logging
-
-import datetime
-#import StringIO
-#from decimal import Decimal
 logger = logging.getLogger(__name__)
-#import payments
 
 __all__ = ['Collect', 'CollectSend', 'CollectSendStart', 'CollectReturn',
            'CollectReturnStart']
