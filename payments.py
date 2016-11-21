@@ -114,7 +114,7 @@ class PaymentMixIn(object):
 
         line = None
         pay_journal = None
-        if config.defualt_payment_collect_journal:
+        if config.default_payment_collect_journal:
             pay_journal = config.default_payment_collect_journal
         if not invoice.company.currency.is_zero(amount):
             line = invoice.pay_invoice(amount,

@@ -111,6 +111,12 @@ class CollectReturnStart(ModelView):
     paymode_type = fields.Selection('get_origin', 'Pay Mode')
     return_file = fields.Binary('Return File')
     pay_date = fields.Date('Pay date')
+    period = fields.Many2One('account.period', 'Period', required=True)
+
+    @classmethod
+    def default_csv_format(cls):
+        Date = Pool().get('ir.date')
+        return Date.today()
 
     @classmethod
     def _get_origin(cls):
