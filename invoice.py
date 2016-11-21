@@ -63,7 +63,7 @@ class Invoice:
         'payment.paymode',
         'Pay mode', domain=[('party', '=', Eval('party'))], states={
             'readonly': Eval('state') != 'draft',
-            'invisible': Eval('type').in_(['in', 'out']),
+            'invisible': Eval('type').in_(['in']),
         }, depends=['party', 'type', 'state'])
 
     def __get_paymode(self):

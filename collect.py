@@ -31,21 +31,7 @@ class Collect(ModelSQL, ModelView):
         ('return', 'Return'),
         ], 'Type', readonly=True)
     period = fields.Many2One('account.period', 'Period', readonly=True)
-    paymode_type = fields.Selection('get_origin', 'Pay Mode', readonly=True)
-
-    @classmethod
-    def _get_origin(cls):
-        'Return list of Model names for origin Reference'
-        return ['']
-
-    @classmethod
-    def get_origin(cls):
-        Model = Pool().get('ir.model')
-        models = cls._get_origin()
-        models = Model.search([
-                ('model', 'in', models),
-                ])
-        return [(None, '')] + [(m.model, m.name) for m in models]
+    paymode_type = fields.Char('Pay Mode', readonly=True)
 
     def get_rec_name(self, name):
         if self.paymode_type:
@@ -80,6 +66,7 @@ class CollectSendStart(ModelView):
     csv_format = fields.Boolean('CSV format',
         help='Check this box if you want export to csv format.')
     period = fields.Many2One('account.period', 'Period', required=True)
+    expiration_date = fields.Date('Fecha de vencimiento')
     paymode_type = fields.Selection('get_origin', 'Pay Mode')
 
     @classmethod

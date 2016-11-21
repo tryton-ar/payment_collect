@@ -20,15 +20,17 @@ class PaymentMixIn(object):
     paymode_type = res = period = type = None
     journal = 'CASH'
 
-    def attach_collect(self):
+    @classmethod
+    def attach_collect(cls):
         pool = Pool()
         Attachment = pool.get('ir.attachment')
-        collect = self._collect()
-        filename = collect.paymode_type + '-' + self.type + '-' + datetime.date.today().strftime("%Y-%m-%d")
+        collect = cls._collect()
+        filename = collect.paymode_type + '-' + cls.type + '-' + \
+            datetime.date.today().strftime("%Y-%m-%d")
         attach = Attachment()
         attach.name = filename + '.txt'
         attach.resource = collect
-        attach.data = ''.join(self.res)
+        attach.data = ''.join(cls.res)
         attach.save()
 
     @classmethod
@@ -44,26 +46,30 @@ class PaymentMixIn(object):
 
         return domain
 
-    def get_order(self):
+    @classmethod
+    def get_order(cls):
         return [
                 ('invoice_date', 'ASC'),
                 ('id', 'ASC')
             ]
 
-    def lista_campo_ordenados(self):
+    @classmethod
+    def lista_campo_ordenados(cls):
         """ Devuelve lista de campos ordenados """
         return []
 
-    def a_texto(self, csv_format=False):
+    @classmethod
+    def a_texto(cls, csv_format=False):
         """ Concatena los valores de los campos de la clase y los
         devuelve en una cadena de texto.
         """
-        campos = self.lista_campo_ordenados()
+        campos = cls.lista_campo_ordenados()
         campos = [x for x in campos if x != '']
-        separador = csv_format and self._SEPARATOR or ''
-        return separador.join(campos) + self._EOL
+        separador = csv_format and cls._SEPARATOR or ''
+        return separador.join(campos) + cls._EOL
 
-    def message_invoice(self, invoice, collect_result, message):
+    @classmethod
+    def message_invoice(cls, invoice, collect_result, message):
         pool = Pool()
         CollectTransaction = pool.get('payment.collect.transaction')
         transaction = CollectTransaction()
@@ -74,7 +80,8 @@ class PaymentMixIn(object):
         transaction.save()
         return transaction
 
-    def pay_invoice(self, invoice, amount_to_pay, pay_date=None):
+    @classmethod
+    def pay_invoice(cls, invoice, amount_to_pay, pay_date=None):
         logger.info("PAY INVOICE: invoice_id: "+repr(invoice.number))
         # Pagar la invoice
         pool = Pool()
@@ -123,23 +130,26 @@ class PaymentMixIn(object):
                 MoveLine.reconcile(reconcile_lines)
         # Fin pagar invoice
 
-    def _collect(self):
+    @classmethod
+    def _collect(cls):
         pool = Pool()
         Collect = pool.get('payment.collect')
         collect = Collect()
-        collect.monto_total = self.monto_total
-        collect.cantidad_registros = self.cantidad_registros
-        collect.period = self.period
-        collect.paymode_type = self.paymode_type
-        collect.type = self.type
+        collect.monto_total = cls.monto_total
+        collect.cantidad_registros = cls.cantidad_registros
+        collect.period = cls.period
+        collect.paymode_type = cls.__name__
+        collect.type = cls.type
         collect.save()
         return collect
 
-    def _add_attach_to_collect(self, collect, return_file):
+    @classmethod
+    def _add_attach_to_collect(cls, collect, return_file):
         Attachment = Pool().get('ir.attachment')
         return_file.seek(0)
         attach = Attachment()
-        filename = collect.paymode_type + '-' + self.type + '-' + datetime.date.today().strftime("%Y-%m-%d")
+        filename = collect.paymode_type + '-' + cls.type + '-' + \
+            datetime.date.today().strftime("%Y-%m-%d")
         attach = Attachment()
         attach.name = filename + '.txt'
         attach.resource = collect

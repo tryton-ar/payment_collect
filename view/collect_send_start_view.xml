@@ -6,6 +6,8 @@ this repository contains the full copyright notices and license terms. -->
     <field name="paymode_type"/>
     <label name="period"/>
     <field name="period"/>
+    <label name="expiration_date"/>
+    <field name="expiration_date"/>
     <label name="csv_format"/>
     <field name="csv_format"/>
 </form>
