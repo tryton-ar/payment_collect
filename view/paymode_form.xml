@@ -6,4 +6,19 @@ this repository contains the full copyright notices and license terms. -->
     <field name="party"/>
     <label name="type"/>
     <field name="type"/>
+    <notebook>
+        <page string="Debito" id="debit">
+            <label name="cbu_number"/>
+            <field name="cbu_number"/>
+        </page>
+        <page string="Tarjeta de credito" id="credit_card">
+            <label name="credit_bank"/>
+            <field name="credit_bank"/>
+            <newline />
+            <label name="credit_number"/>
+            <field name="credit_number"/>
+            <label name="credit_expiration_date"/>
+            <field name="credit_expiration_date"/>
+        </page>
+    </notebook>
 </form>

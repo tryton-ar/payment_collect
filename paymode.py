@@ -15,11 +15,13 @@ class PayMode(ModelSQL, ModelView):
         required=True, select=True)
     type = fields.Selection('get_origin', 'Type')
 
+    ## DEBIT
+    cbu_number = fields.Char('CBU number')
     ## CREDIT
-    #credit_paymode = fields.Many2One('payment.paymode.credit_card', 'Credit Card')
-    #credit_number = fields.Char('Number')
-    #credit_expiration_date = fields.Date('Expiration date')
-    #credit_bank = fields.Many2One('bank', 'Credit card bank')
+    #credit_paymode = fields.Selection('get_credit_paymode', 'Type')
+    credit_number = fields.Char('Number')
+    credit_expiration_date = fields.Date('Expiration date')
+    credit_bank = fields.Many2One('bank', 'Credit card bank')
 
     @classmethod
     def _get_origin(cls):
@@ -34,7 +36,6 @@ class PayMode(ModelSQL, ModelView):
                 ('model', 'in', models),
                 ])
         return [(None, '')] + [(m.model, m.name) for m in models]
-
 
     def get_rec_name(self, name):
         if self.type and self.party:
