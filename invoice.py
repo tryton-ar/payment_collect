@@ -111,3 +111,12 @@ class Invoice:
         for values in vlist:
             values.update(cls.compute_default_paymode(values))
         return super(Invoice, cls).create(vlist)
+
+    @classmethod
+    def copy(cls, invoices, default=None):
+        if default is None:
+            default = {}
+        else:
+            default = default.copy()
+        default['collect_transactions'] = None
+        return super(Invoice, cls).copy(invoices, default=default)
