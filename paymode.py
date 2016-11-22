@@ -41,4 +41,4 @@ class PayMode(ModelSQL, ModelView):
         if self.type and self.party:
             return '['+self.type+'] '+self.party.name
         else:
-            return self.name
+            return name
