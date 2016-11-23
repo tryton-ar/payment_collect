@@ -18,7 +18,7 @@ class PaymentMixIn(object):
     monto_total = Decimal('0')
     cantidad_registros = 0
     paymode_type = res = period = type = None
-    journal = 'CASH'
+    #journal = 'CASH'
 
     @classmethod
     def attach_collect(cls):
@@ -81,7 +81,7 @@ class PaymentMixIn(object):
         return transaction
 
     @classmethod
-    def pay_invoice(cls, invoice, amount_to_pay, pay_date=None):
+    def pay_invoice(cls, invoice, amount_to_pay, pay_date=None, journal=None):
         logger.info("PAY INVOICE: invoice_id: "+repr(invoice.number))
         # Pagar la invoice
         pool = Pool()
@@ -114,8 +114,10 @@ class PaymentMixIn(object):
 
         line = None
         pay_journal = None
-        if config.default_payment_collect_journal:
+        if config.default_payment_collect_journal and journal is None:
             pay_journal = config.default_payment_collect_journal
+        else:
+            pay_journal = journal
         if not invoice.company.currency.is_zero(amount):
             line = invoice.pay_invoice(amount,
                                        pay_journal, pay_date,
