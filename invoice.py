@@ -101,7 +101,8 @@ class Invoice:
             invoice.company = Company(company)
             invoice.payment_type = None
             invoice.__get_paymode()
-            changes['paymode'] = invoice.paymode
+            if hasattr(invoice, 'paymode'):
+                changes['paymode'] = invoice.paymode
 
         return changes
 
