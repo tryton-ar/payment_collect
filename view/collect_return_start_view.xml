@@ -5,8 +5,8 @@ this repository contains the full copyright notices and license terms. -->
     <label name="paymode_type"/>
     <field name="paymode_type"/>
     <newline />
+    <label name="period"/>
+    <field name="period"/>
     <label name="return_file"/>
     <field name="return_file"/>
-    <label name="pay_date"/>
-    <field name="pay_date"/>
 </form>
