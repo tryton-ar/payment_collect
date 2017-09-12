@@ -1,19 +1,19 @@
 # ! -*- coding: utf8 -*-
-# This file is part of Tryton.  The COPYRIGHT file at the top level of
-# this repository contains the full copyright notices and license terms.
-
+# This file is part of the payment_collect module for Tryton.
+# The COPYRIGHT file at the top level of this repository contains
+# the full copyright notices and license terms.
 from trytond.wizard import Wizard, StateView, StateTransition, Button
 from trytond.model import fields, ModelSQL, ModelView
-from trytond.pool import Pool, PoolMeta
+from trytond.pool import Pool
 import logging
 logger = logging.getLogger(__name__)
 
 __all__ = ['Collect', 'CollectSend', 'CollectSendStart', 'CollectReturn',
            'CollectReturnStart']
-__metaclass__ = PoolMeta
+
 
 class Collect(ModelSQL, ModelView):
-    "Invoice"
+    'Collect'
     __name__ = 'payment.collect'
 
     monto_total = fields.Numeric('Monto total', digits=(16, 2), readonly=True)
