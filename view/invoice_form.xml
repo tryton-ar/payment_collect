@@ -2,10 +2,9 @@
 <!-- The COPYRIGHT file at the top level of this repository contains the full
 copyright notices and license terms. -->
 <data>
-    <xpath expr="/form/notebook/page[@id='invoice']" position="replace_attributes">
-        <page string="Invoice" id="invoice" col="4" />
-    </xpath>
-    <xpath expr="/form/notebook/page[@id='invoice']/field[@name='invoice_date']" position="after">
+    <xpath
+    expr="/form/notebook/page[@id=&quot;invoice&quot;]/field[@name=&quot;payment_term&quot;]"
+    position="after">
         <label name="paymode"/>
         <field name="paymode"/>
     </xpath>
