@@ -5,11 +5,10 @@
 
 from trytond.model import fields, ModelSQL, ModelView
 from trytond.pool import PoolMeta, Pool
-from trytond.pyson import Eval
+from trytond.pyson import Eval, Not, Bool
 from trytond.transaction import Transaction
 
 __all__ = ['Invoice', 'CollectTransaction']
-__metaclass__ = PoolMeta
 
 
 class CollectTransaction(ModelSQL, ModelView):
@@ -52,7 +51,7 @@ class CollectTransaction(ModelSQL, ModelView):
 
 
 class Invoice:
-    "Invoice"
+    __metaclass__ = PoolMeta
     __name__ = 'account.invoice'
 
     collect_transactions = fields.One2Many(
@@ -63,9 +62,8 @@ class Invoice:
     paymode = fields.Many2One(
         'payment.paymode',
         'Pay mode', domain=[('party', '=', Eval('party'))], states={
-            'readonly': Eval('state') != 'draft',
-            'invisible': Eval('type').in_(['in', 'out']),
-        }, depends=['party', 'type', 'state'])
+            'readonly': Not(Bool(Eval('state').in_(['draft', 'validated']))),
+        }, depends=['party', 'state'])
 
     def __get_paymode(self):
         '''
