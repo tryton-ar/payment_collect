@@ -2,25 +2,25 @@
 #The COPYRIGHT file at the top level of this repository contains
 #the full copyright notices and license terms.
 from trytond.pool import Pool
-from .paymode import *
-from .collect import *
-from .invoice import *
-from .party import *
-from .configuration import *
+from . import paymode
+from . import collect
+from . import invoice
+from . import party
+from . import configuration
 
 
 def register():
     Pool.register(
-        Party,
-        PayMode,
-        Collect,
-        CollectSendStart,
-        CollectReturnStart,
-        CollectTransaction,
-        Invoice,
-        Configuration,
+        party.Party,
+        paymode.PayMode,
+        collect.Collect,
+        collect.CollectSendStart,
+        collect.CollectReturnStart,
+        collect.CollectTransaction,
+        invoice.Invoice,
+        configuration.Configuration,
         module='payment_collect', type_='model')
     Pool.register(
-        CollectSend,
-        CollectReturn,
+        collect.CollectSend,
+        collect.CollectReturn,
         module='payment_collect', type_='wizard')
