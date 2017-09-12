@@ -16,7 +16,7 @@ def register():
         collect.Collect,
         collect.CollectSendStart,
         collect.CollectReturnStart,
-        collect.CollectTransaction,
+        invoice.CollectTransaction,
         invoice.Invoice,
         configuration.Configuration,
         module='payment_collect', type_='model')
