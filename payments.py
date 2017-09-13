@@ -19,17 +19,16 @@ class PaymentMixIn(object):
     paymode_type = res = period = type = None
     #journal = 'CASH'
 
-    @classmethod
-    def attach_collect(cls):
+    def attach_collect(self):
         pool = Pool()
         Attachment = pool.get('ir.attachment')
-        collect = cls._collect()
-        filename = collect.paymode_type + '-' + cls.type + '-' + \
+        collect = self.create_collect()
+        filename = collect.paymode_type + '-' + self.type + '-' + \
             datetime.date.today().strftime("%Y-%m-%d")
         attach = Attachment()
         attach.name = filename + '.txt'
         attach.resource = collect
-        attach.data = ''.join(cls.res)
+        attach.data = ''.join(self.res)
         attach.save()
         return collect
 
@@ -53,20 +52,18 @@ class PaymentMixIn(object):
                 ('id', 'ASC')
             ]
 
-    @classmethod
-    def lista_campo_ordenados(cls):
+    def lista_campo_ordenados(self):
         """ Devuelve lista de campos ordenados """
         return []
 
-    @classmethod
-    def a_texto(cls, csv_format=False):
+    def a_texto(self, csv_format=False):
         """ Concatena los valores de los campos de la clase y los
         devuelve en una cadena de texto.
         """
-        campos = cls.lista_campo_ordenados()
+        campos = self.lista_campo_ordenados()
         campos = [x for x in campos if x != '']
-        separador = csv_format and cls._SEPARATOR or ''
-        return separador.join(campos) + cls._EOL
+        separador = csv_format and self._SEPARATOR or ''
+        return separador.join(campos) + self._EOL
 
     @classmethod
     def message_invoice(cls, invoice, collect_result, message):
@@ -132,25 +129,22 @@ class PaymentMixIn(object):
                 MoveLine.reconcile(reconcile_lines)
         # Fin pagar invoice
 
-    @classmethod
-    def _collect(cls):
-        pool = Pool()
-        Collect = pool.get('payment.collect')
+    def create_collect(self):
+        Collect = Pool().get('payment.collect')
         collect = Collect()
-        collect.monto_total = cls.monto_total
-        collect.cantidad_registros = cls.cantidad_registros
-        collect.period = cls.period
-        collect.paymode_type = cls.__name__
-        collect.type = cls.type
+        collect.monto_total = self.monto_total
+        collect.cantidad_registros = self.cantidad_registros
+        collect.period = self.period
+        collect.paymode_type = self.__name__
+        collect.type = self.type
         collect.save()
         return collect
 
-    @classmethod
-    def _add_attach_to_collect(cls, collect, return_file):
+    def _add_attach_to_collect(self, collect, return_file):
         Attachment = Pool().get('ir.attachment')
         return_file.seek(0)
         attach = Attachment()
-        filename = collect.paymode_type + '-' + cls.type + '-' + \
+        filename = collect.paymode_type + '-' + self.type + '-' + \
             datetime.date.today().strftime("%Y-%m-%d")
         attach = Attachment()
         attach.name = filename + '.txt'
