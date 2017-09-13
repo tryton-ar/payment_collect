@@ -2,7 +2,7 @@
 # This file is part of the payment_collect module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
-from trytond.wizard import Wizard, StateView, StateTransition, Button
+from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.model import fields, ModelSQL, ModelView
 from trytond.pool import Pool
 import logging
@@ -95,13 +95,18 @@ class CollectSend(Wizard):
             Button('Generate Collect', 'generate_collect', 'tryton-ok',
                    default=True),
         ])
-    generate_collect = StateTransition()
+    generate_collect = StateAction(
+        'payment_collect.act_payment_collect')
 
-    def transition_generate_collect(self):
-        logger.info("should creating new collect..")
-        PayModeType = Pool().get(self.start.paymode_type)
-        PayModeType.generate_collect(self.start)
-        return 'end'
+    def do_generate_collect(self, action):
+        collects = []
+        if self.start.paymode_type:
+            PayModeType = Pool().get(self.start.paymode_type)
+            collects = PayModeType.generate_collect(self.start)
+        data = {'res_id': [c.id for c in collects]}
+        if len(collects) == 1:
+            action['views'].reverse()
+        return action, data
 
 
 class CollectReturnStart(ModelView):
@@ -143,10 +148,15 @@ class CollectReturn(Wizard):
             Button('Cancel', 'end', 'tryton-cancel'),
             Button('Return Collect', 'return_collect', 'tryton-ok', default=True),
         ])
-    return_collect = StateTransition()
+    return_collect = StateAction(
+        'payment_collect.act_payment_collect')
 
-    def transition_return_collect(self):
-        logger.info("should creating new return collect..")
-        PayModeType = Pool().get(self.start.paymode_type)
-        PayModeType.return_collect(self.start)
-        return 'end'
+    def do_return_collect(self, action):
+        collects = []
+        if self.start.paymode_type:
+            PayModeType = Pool().get(self.start.paymode_type)
+            collects = PayModeType.return_collect(self.start)
+        data = {'res_id': [c.id for c in collects]}
+        if len(collects) == 1:
+            action['views'].reverse()
+        return action, data
