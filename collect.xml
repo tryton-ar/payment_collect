@@ -17,19 +17,19 @@ copyright notices and license terms. -->
         </record>
 
         <!-- Payment Collect -->
-        <record model="ir.action.act_window" id="act_payment_collect_form">
+        <record model="ir.action.act_window" id="act_payment_collect">
             <field name="name">Payment Collect</field>
             <field name="res_model">payment.collect</field>
         </record>
         <record model="ir.action.act_window.view" id="act_payment_collect_form_view1">
             <field name="sequence" eval="10"/>
             <field name="view" ref="collect_view_tree"/>
-            <field name="act_window" ref="act_payment_collect_form"/>
+            <field name="act_window" ref="act_payment_collect"/>
         </record>
         <record model="ir.action.act_window.view" id="act_payment_collect_form_view2">
             <field name="sequence" eval="20"/>
             <field name="view" ref="collect_view_form"/>
-            <field name="act_window" ref="act_payment_collect_form"/>
+            <field name="act_window" ref="act_payment_collect"/>
         </record>
 
         <!-- Wizard Collect -->
@@ -56,8 +56,8 @@ copyright notices and license terms. -->
 
         <menuitem name="Payment Collect" parent="account.menu_account"
             id="menu_account_payment_collect" sequence="40"/>
-        <menuitem parent="menu_account_payment_collect" action="act_payment_collect_form"
-            id="menu_account_payment_collect_form" sequence="10"/>
+        <menuitem parent="menu_account_payment_collect" action="act_payment_collect"
+            id="menu_payment_collects" sequence="10"/>
         <menuitem parent="menu_account_payment_collect" action="wizard_collect_send"
             id="menu_account_payment_collect_send" icon="tryton-print"/>
         <menuitem parent="menu_account_payment_collect" action="wizard_collect_return"

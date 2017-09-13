@@ -31,6 +31,7 @@ class PaymentMixIn(object):
         attach.resource = collect
         attach.data = ''.join(cls.res)
         attach.save()
+        return collect
 
     @classmethod
     def get_domain(cls, period):
