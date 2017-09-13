@@ -102,7 +102,8 @@ class CollectSend(Wizard):
         collects = []
         if self.start.paymode_type:
             PayModeType = Pool().get(self.start.paymode_type)
-            collects = PayModeType.generate_collect(self.start)
+            paymode = PayModeType()
+            collects = paymode.generate_collect(self.start)
         data = {'res_id': [c.id for c in collects]}
         if len(collects) == 1:
             action['views'].reverse()
@@ -155,7 +156,8 @@ class CollectReturn(Wizard):
         collects = []
         if self.start.paymode_type:
             PayModeType = Pool().get(self.start.paymode_type)
-            collects = PayModeType.return_collect(self.start)
+            paymode = PayModeType()
+            collects = paymode.return_collect(self.start)
         data = {'res_id': [c.id for c in collects]}
         if len(collects) == 1:
             action['views'].reverse()
