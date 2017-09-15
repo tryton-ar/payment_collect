@@ -34,10 +34,12 @@ class PaymentMixIn(object):
 
     @classmethod
     def get_domain(cls, period):
+        Config = Pool().get('account.configuration')
+        config = Config(1)
         invoice_type = ['out']
 
         domain = [
-            ('state', 'in', ['posted']),
+            ('state', 'in', [config.when_collect_payment]),
             ('type', 'in', invoice_type),
             ('invoice_date', '>=', period.start_date),
             ('invoice_date', '<=', period.end_date),

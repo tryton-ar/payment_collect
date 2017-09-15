@@ -5,6 +5,8 @@ copyright notices and license terms. -->
     <xpath expr="/form"
         position="inside">
         <separator id="payment_collect" string="Payment Collect" colspan="4"/>
+        <label name="when_collect_payment"/>
+        <field name="when_collect_payment"/>
         <label name="default_payment_collect_journal"/>
         <field name="default_payment_collect_journal"/>
         <newline/>
