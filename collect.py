@@ -2,7 +2,9 @@
 # This file is part of the payment_collect module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
+from decimal import Decimal
 from trytond.wizard import Wizard, StateView, StateAction, Button
+from trytond.transaction import Transaction
 from trytond.model import fields, ModelSQL, ModelView
 from trytond.pool import Pool
 import logging
@@ -63,6 +65,7 @@ class Collect(ModelSQL, ModelView):
         super(Collect, cls).__setup__()
         cls._buttons.update({
                 'post_invoices': {},
+                'pay_invoices': {},
                 })
 
     @classmethod
@@ -77,6 +80,74 @@ class Collect(ModelSQL, ModelView):
             for transaction in collect.transactions_accepted:
                 invoices.append(transaction.invoice)
         Invoice.post(invoices)
+
+    @classmethod
+    def pay_invoice(cls, invoice, amount_to_pay, pay_date=None, journal=None):
+        logger.info("PAY INVOICE: invoice_id: "+repr(invoice.number))
+        # Pagar la invoice
+        pool = Pool()
+        Currency = pool.get('currency.currency')
+        Configuration = pool.get('account.configuration')
+        MoveLine = pool.get('account.move.line')
+        Date = Pool().get('ir.date')
+
+        if pay_date is None:
+            pay_date = Date.today()
+
+        with Transaction().set_context(date=pay_date):
+            amount = Currency.compute(invoice.currency,
+                amount_to_pay, invoice.company.currency)
+
+        # FIXME migrate 4.0?
+        #if invoice.type in ('in_invoice', 'out_credit_note'):
+        #    amount = -amount
+
+        reconcile_lines, remainder = \
+            invoice.get_reconcile_lines_for_amount(amount)
+
+        config = Configuration(1)
+
+        amount_second_currency = None
+        second_currency = None
+        if invoice.currency != invoice.company.currency:
+            amount_second_currency = amount_to_pay
+            second_currency = invoice.currency
+
+        line = None
+        pay_journal = None
+        if config.default_payment_collect_journal and journal is None:
+            pay_journal = config.default_payment_collect_journal
+        else:
+            pay_journal = journal
+        if not invoice.company.currency.is_zero(amount):
+            line = invoice.pay_invoice(amount,
+                                       pay_journal, pay_date,
+                                       invoice.number, amount_second_currency,
+                                       second_currency)
+        if remainder != Decimal('0.0'):
+            return
+        else:
+            if line:
+                reconcile_lines += [line]
+            if reconcile_lines:
+                MoveLine.reconcile(reconcile_lines)
+        # Fin pagar invoice
+
+    @classmethod
+    @ModelView.button
+    def pay_invoices(cls, collects):
+        '''
+        pay invoices.
+        '''
+        Configuration = Pool().get('account.configuration')
+        config = Configuration(1)
+        default_journal = None
+        if config.default_payment_collect_bccl:
+            default_journal = config.default_payment_collect_bccl
+        for collect in collects:
+            for transaction in collect.transactions_accepted:
+                cls.pay_invoice(transaction.invoice,
+                    transaction.invoice.amount_to_pay, default_journal)
 
 
 class CollectSendStart(ModelView):
