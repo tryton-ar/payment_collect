@@ -12,10 +12,19 @@ copyright notices and license terms. -->
     <field name="cantidad_registros"/>
     <label name="monto_total"/>
     <field name="monto_total"/>
-    <field name="attachments" colspan="4"/>
-    <newline/>
-    <field name="transactions_accepted" colspan="4"/>
-    <newline/>
-    <field name="transactions_rejected" colspan="4"/>
+    <notebook>
+        <page string="Attachments" id="attachments">
+            <field name="attachments" colspan="4"/>
+        </page>
+        <page string="Accepted Invoices" id="accepeted_invoices">
+            <field name="transactions_accepted" colspan="4"/>
+        </page>
+        <page string="Rejected Invoices" id="rejected_invoices">
+            <field name="transactions_rejected" colspan="4"/>
+        </page>
+        <page string="Process Invoices" id="process_invoices">
+            <button name="post_invoices" string="Post invoices"/>
+        </page>
+    </notebook>
 </form>
 
