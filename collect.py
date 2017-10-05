@@ -58,6 +58,26 @@ class Collect(ModelSQL, ModelView):
             transactions.add(transaction.id)
         return list(transactions)
 
+    @classmethod
+    def __setup__(cls):
+        super(Collect, cls).__setup__()
+        cls._buttons.update({
+                'post_invoices': {},
+                })
+
+    @classmethod
+    @ModelView.button
+    def post_invoices(cls, collects):
+        '''
+        post invoices.
+        '''
+        Invoice = Pool().get('invoice.inovice')
+        invoices = []
+        for collect in collects:
+            for transaction in collect.transactions_accepted:
+                invoices.append(transaction.invoice)
+        Invoice.post(invoices)
+
 
 class CollectSendStart(ModelView):
     'Collect Send Start'
