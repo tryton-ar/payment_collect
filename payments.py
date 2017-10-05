@@ -2,12 +2,15 @@
 # This file is part of the payment_collect module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
-import logging
-logger = logging.getLogger(__name__)
-from trytond.pool import Pool
 from decimal import Decimal
 import datetime
+import StringIO
+from trytond.pool import Pool
 from trytond.transaction import Transaction
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class PaymentMixIn(object):
 
@@ -140,6 +143,7 @@ class PaymentMixIn(object):
         collect.paymode_type = self.__name__
         collect.type = self.type
         collect.save()
+        self.collect = collect
         return collect
 
     def _add_attach_to_collect(self, collect, return_file):
@@ -153,3 +157,33 @@ class PaymentMixIn(object):
         attach.resource = collect
         attach.data = return_file.read()
         attach.save()
+
+    def return_collect(self, start):
+        self.type = 'return'
+        self.return_file = StringIO.StringIO(start.return_file)
+        self.period = start.period
+        self.create_collect()
+        self.invoices_id = {
+            'accepted_invoices': [],
+            'rejected_invoices': [],
+            }
+        self.codigo_retorno = {}
+        return []
+
+    def set_invoice_transaction(self, tabla_codigos):
+        Invoice = Pool().get('account.invoice')
+        accepted_invoices = Invoice.browse(self.invoices_id['accepted_invoices'])
+        rejected_invoices = Invoice.browse(self.invoices_id['rejected_invoices'])
+
+        for invoice in accepted_invoices:
+            transaction = self.message_invoice(invoice, 'A',
+                'Movimiento Aceptado')
+            transaction.collect = self.collect
+            transaction.save()
+
+        for invoice in rejected_invoices:
+            transaction = self.message_invoice(invoice, 'R',
+                tabla_codigos[self.codigo_retorno[str(invoice.id)]])
+            transaction.collect = self.collect
+            transaction.save()
+        self._add_attach_to_collect(self.collect, self.return_file)
