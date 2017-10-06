@@ -17,19 +17,42 @@ copyright notices and license terms. -->
         </record>
 
         <!-- Payment Collect -->
-        <record model="ir.action.act_window" id="act_payment_collect">
-            <field name="name">Payment Collect</field>
+        <record model="ir.action.act_window" id="act_payment_collect_send">
+            <field name="name">Sending Collects</field>
             <field name="res_model">payment.collect</field>
+            <field name="domain" eval="[('type', '=', 'send')]" pyson="1"/>
+            <field name="context" eval="{'type': 'send'}" pyson="1"/>
+            <field name="search_value"></field>
         </record>
-        <record model="ir.action.act_window.view" id="act_payment_collect_form_view1">
+
+        <record model="ir.action.act_window" id="act_payment_collect_return">
+            <field name="name">Returning Collects</field>
+            <field name="res_model">payment.collect</field>
+            <field name="domain" eval="[('type', '=', 'return')]" pyson="1"/>
+            <field name="context" eval="{'type': 'return'}" pyson="1"/>
+            <field name="search_value"></field>
+        </record>
+
+        <record model="ir.action.act_window.view" id="act_payment_collect_send_form_view1">
             <field name="sequence" eval="10"/>
             <field name="view" ref="collect_view_tree"/>
-            <field name="act_window" ref="act_payment_collect"/>
+            <field name="act_window" ref="act_payment_collect_send"/>
         </record>
-        <record model="ir.action.act_window.view" id="act_payment_collect_form_view2">
+        <record model="ir.action.act_window.view" id="act_payment_collect_send_form_view2">
             <field name="sequence" eval="20"/>
             <field name="view" ref="collect_view_form"/>
-            <field name="act_window" ref="act_payment_collect"/>
+            <field name="act_window" ref="act_payment_collect_send"/>
+        </record>
+
+        <record model="ir.action.act_window.view" id="act_payment_collect_return_form_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="collect_view_tree"/>
+            <field name="act_window" ref="act_payment_collect_return"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_payment_collect_return_form_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="collect_view_form"/>
+            <field name="act_window" ref="act_payment_collect_return"/>
         </record>
 
         <record model="ir.action.act_window.domain" id="act_collect_form_domain_processing">
@@ -39,7 +62,7 @@ copyright notices and license terms. -->
                 eval="[('state', '=', 'processing')]"
                 pyson="1"/>
             <field name="count" eval="True"/>
-            <field name="act_window" ref="act_payment_collect"/>
+            <field name="act_window" ref="act_payment_collect_return"/>
         </record>
         <record model="ir.action.act_window.domain" id="act_collect_form_domain_confirmed">
             <field name="name">Confirmed</field>
@@ -48,13 +71,13 @@ copyright notices and license terms. -->
                 eval="[('state', '=', 'confirmed')]"
                 pyson="1"/>
             <field name="count" eval="True"/>
-            <field name="act_window" ref="act_payment_collect"/>
+            <field name="act_window" ref="act_payment_collect_return"/>
         </record>
         <record model="ir.action.act_window.domain" id="act_collect_form_domain_all">
             <field name="name">All</field>
             <field name="sequence" eval="9999"/>
             <field name="domain"></field>
-            <field name="act_window" ref="act_payment_collect"/>
+            <field name="act_window" ref="act_payment_collect_return"/>
         </record>
 
         <!-- Wizard Collect -->
@@ -81,12 +104,20 @@ copyright notices and license terms. -->
 
         <menuitem name="Payment Collect" parent="account.menu_account"
             id="menu_account_payment_collect" sequence="40"/>
-        <menuitem parent="menu_account_payment_collect" action="act_payment_collect"
-            id="menu_payment_collects" sequence="10"/>
-        <menuitem parent="menu_account_payment_collect" action="wizard_collect_send"
-            id="menu_account_payment_collect_send" icon="tryton-print"/>
-        <menuitem parent="menu_account_payment_collect" action="wizard_collect_return"
-            id="menu_account_payment_collect_return" icon="tryton-print"/>
+
+        <menuitem parent="menu_account_payment_collect" action="act_payment_collect_send"
+            id="menu_payment_collects_send" sequence="1"/>
+        <menuitem parent="menu_account_payment_collect" action="act_payment_collect_return"
+            id="menu_payment_collects_return" sequence="2"/>
+
+        <menuitem name="Processing" parent="menu_account_payment_collect"
+            id="menu_account_payment_collect_processing" sequence="50"/>
+        <menuitem parent="menu_account_payment_collect_processing"
+            action="wizard_collect_send"
+            id="menu_account_payment_collect_send" icon="tryton-executable"/>
+        <menuitem parent="menu_account_payment_collect_processing"
+            action="wizard_collect_return"
+            id="menu_account_payment_collect_return" icon="tryton-executable"/>
 
     </data>
 </tryton>
