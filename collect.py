@@ -5,16 +5,23 @@
 from decimal import Decimal
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.transaction import Transaction
-from trytond.model import fields, ModelSQL, ModelView
+from trytond.model import Workflow, fields, ModelSQL, ModelView
 from trytond.pool import Pool
+from trytond.pyson import Eval
 import logging
 logger = logging.getLogger(__name__)
 
 __all__ = ['Collect', 'CollectSend', 'CollectSendStart', 'CollectReturn',
            'CollectReturnStart']
 
+STATES = [
+    ('processing', 'Processing'),
+    ('confirmed', 'Confirmed'),
+    ('published', 'Published'),
+    ('done', 'Done'),
+    ]
 
-class Collect(ModelSQL, ModelView):
+class Collect(Workflow, ModelSQL, ModelView):
     'Collect'
     __name__ = 'payment.collect'
 
@@ -34,6 +41,32 @@ class Collect(ModelSQL, ModelView):
         ], 'Type', readonly=True)
     period = fields.Many2One('account.period', 'Period', readonly=True)
     paymode_type = fields.Char('Pay Mode', readonly=True)
+    state = fields.Selection(STATES, 'State', readonly=True, required=True)
+
+    @classmethod
+    def __setup__(cls):
+        super(Collect, cls).__setup__()
+        cls._transitions |= set((
+                ('processing', 'processing'),
+                ('processing', 'confirmed'),
+                ('confirmed', 'published'),
+                ('published', 'done'),
+                ))
+        cls._buttons.update({
+                #'post_invoices': {},
+                #'pay_invoices': {},
+                'post_invoices': {
+                    'invisible': Eval('state') != 'processing',
+                    'readonly': ~Eval('transactions_accepted', []),
+                    },
+                'pay_invoices': {
+                    'invisible': Eval('state') != 'confirmed',
+                    },
+                })
+
+    @staticmethod
+    def default_state():
+        return 'processing'
 
     def get_rec_name(self, name):
         if self.paymode_type:
@@ -59,27 +92,6 @@ class Collect(ModelSQL, ModelView):
         for transaction in transactions_rejected:
             transactions.add(transaction.id)
         return list(transactions)
-
-    @classmethod
-    def __setup__(cls):
-        super(Collect, cls).__setup__()
-        cls._buttons.update({
-                'post_invoices': {},
-                'pay_invoices': {},
-                })
-
-    @classmethod
-    @ModelView.button
-    def post_invoices(cls, collects):
-        '''
-        post invoices.
-        '''
-        Invoice = Pool().get('invoice.inovice')
-        invoices = []
-        for collect in collects:
-            for transaction in collect.transactions_accepted:
-                invoices.append(transaction.invoice)
-        Invoice.post(invoices)
 
     @classmethod
     def pay_invoice(cls, invoice, amount_to_pay, pay_date=None, journal=None):
@@ -135,6 +147,21 @@ class Collect(ModelSQL, ModelView):
 
     @classmethod
     @ModelView.button
+    @Workflow.transition('confirmed')
+    def post_invoices(cls, collects):
+        '''
+        post invoices.
+        '''
+        Invoice = Pool().get('account.invoice')
+        invoices = []
+        for collect in collects:
+            for transaction in collect.transactions_accepted:
+                invoices.append(transaction.invoice)
+        Invoice.post(invoices)
+
+    @classmethod
+    @ModelView.button
+    @Workflow.transition('done')
     def pay_invoices(cls, collects):
         '''
         pay invoices.
