@@ -4,10 +4,14 @@ copyright notices and license terms. -->
 <form>
     <label name="collect_result" />
     <field name="collect_result" />
-    <label name="collect" />
-    <field name="collect" />
     <label name="invoice" />
     <field name="invoice" />
+    <label name="pay_date" />
+    <field name="pay_date" />
+    <label name="pay_amount" />
+    <field name="pay_amount" />
+    <label name="journal" />
+    <field name="journal" />
     <notebook colspan="4">
         <page string="Mensaje" id='mensaje'>
             <field name="collect_message" />

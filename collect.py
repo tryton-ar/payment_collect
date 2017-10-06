@@ -17,7 +17,7 @@ __all__ = ['Collect', 'CollectSend', 'CollectSendStart', 'CollectReturn',
 STATES = [
     ('processing', 'Processing'),
     ('confirmed', 'Confirmed'),
-    ('published', 'Published'),
+    ('paid', 'Paid'),
     ('done', 'Done'),
     ]
 
@@ -49,18 +49,19 @@ class Collect(Workflow, ModelSQL, ModelView):
         cls._transitions |= set((
                 ('processing', 'processing'),
                 ('processing', 'confirmed'),
-                ('confirmed', 'published'),
-                ('published', 'done'),
+                ('confirmed', 'paid'),
+                ('paid', 'done'),
                 ))
         cls._buttons.update({
-                #'post_invoices': {},
-                #'pay_invoices': {},
                 'post_invoices': {
                     'invisible': Eval('state') != 'processing',
                     'readonly': ~Eval('transactions_accepted', []),
                     },
                 'pay_invoices': {
                     'invisible': Eval('state') != 'confirmed',
+                    },
+                'publish_invoices': {
+                    'invisible': Eval('state') != 'paid',
                     },
                 })
 
@@ -94,25 +95,24 @@ class Collect(Workflow, ModelSQL, ModelView):
         return list(transactions)
 
     @classmethod
-    def pay_invoice(cls, invoice, amount_to_pay, pay_date=None, journal=None):
-        logger.info("PAY INVOICE: invoice_id: "+repr(invoice.number))
-        # Pagar la invoice
+    def pay_invoice(cls, transaction):
+        '''
+        Adds a payment of amount to an invoice using the journal, date and
+        description.
+        '''
         pool = Pool()
         Currency = pool.get('currency.currency')
         Configuration = pool.get('account.configuration')
         MoveLine = pool.get('account.move.line')
-        Date = Pool().get('ir.date')
 
-        if pay_date is None:
-            pay_date = Date.today()
+        invoice = transaction.invoice
+        amount_to_pay = transaction.pay_amount
+        journal = transaction.journal
+        pay_date = transaction.pay_date
 
         with Transaction().set_context(date=pay_date):
             amount = Currency.compute(invoice.currency,
                 amount_to_pay, invoice.company.currency)
-
-        # FIXME migrate 4.0?
-        #if invoice.type in ('in_invoice', 'out_credit_note'):
-        #    amount = -amount
 
         reconcile_lines, remainder = \
             invoice.get_reconcile_lines_for_amount(amount)
@@ -143,7 +143,6 @@ class Collect(Workflow, ModelSQL, ModelView):
                 reconcile_lines += [line]
             if reconcile_lines:
                 MoveLine.reconcile(reconcile_lines)
-        # Fin pagar invoice
 
     @classmethod
     @ModelView.button
@@ -161,20 +160,28 @@ class Collect(Workflow, ModelSQL, ModelView):
 
     @classmethod
     @ModelView.button
-    @Workflow.transition('done')
+    @Workflow.transition('paid')
     def pay_invoices(cls, collects):
         '''
         pay invoices.
         '''
-        Configuration = Pool().get('account.configuration')
-        config = Configuration(1)
-        default_journal = None
-        if config.default_payment_collect_bccl:
-            default_journal = config.default_payment_collect_bccl
         for collect in collects:
             for transaction in collect.transactions_accepted:
-                cls.pay_invoice(transaction.invoice,
-                    transaction.invoice.amount_to_pay, default_journal)
+                cls.pay_invoice(transaction)
+
+    @classmethod
+    @ModelView.button
+    @Workflow.transition('done')
+    def publish_invoices(cls, collects):
+        '''
+        publish invoices.
+        '''
+        InvoiceReport = Pool().get('account.invoice', type='report')
+        invoices = []
+        for collect in collects:
+            for transaction in collect.transactions_accepted:
+                invoices.append(transaction.invoice)
+        InvoiceReport.execute([i.id for i in invoices], {})
 
 
 class CollectSendStart(ModelView):
@@ -214,7 +221,7 @@ class CollectSend(Wizard):
                    default=True),
         ])
     generate_collect = StateAction(
-        'payment_collect.act_payment_collect')
+        'payment_collect.act_payment_collect_send')
 
     def do_generate_collect(self, action):
         collects = []
@@ -268,7 +275,7 @@ class CollectReturn(Wizard):
             Button('Return Collect', 'return_collect', 'tryton-ok', default=True),
         ])
     return_collect = StateAction(
-        'payment_collect.act_payment_collect')
+        'payment_collect.act_payment_collect_return')
 
     def do_return_collect(self, action):
         collects = []

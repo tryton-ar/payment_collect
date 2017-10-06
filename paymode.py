@@ -6,6 +6,7 @@ from trytond.pool import Pool
 
 __all__ = ['PayMode']
 
+
 class PayMode(ModelSQL, ModelView):
     'Paymode'
     __name__ = 'payment.paymode'

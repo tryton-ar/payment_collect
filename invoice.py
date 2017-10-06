@@ -36,6 +36,10 @@ class CollectTransaction(ModelSQL, ModelView):
                                     'get_invoice_state')
     amount = fields.Function(fields.Char('Amount', readonly=True),
                              'get_invoice_amount')
+    pay_date = fields.Date('Pay Date', readonly=True)
+    pay_amount = fields.Numeric('Pay Amount', digits=(16, 2), readonly=True)
+    journal = fields.Many2One('account.journal', 'Journal', required=True,
+            domain=[('type', '=', 'cash')], readonly=True)
 
     def get_party(self, name):
         return self.invoice.party.id

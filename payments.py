@@ -71,11 +71,19 @@ class PaymentMixIn(object):
         return separador.join(campos) + self._EOL
 
     @classmethod
-    def message_invoice(cls, invoice, collect_result, message):
-        pool = Pool()
-        CollectTransaction = pool.get('payment.collect.transaction')
+    def message_invoice(cls, invoices, collect_result, message, pay_amount,
+            pay_date=None, journal=None):
+        CollectTransaction = Pool().get('payment.collect.transaction')
+        Configuration = Pool().get('account.configuration')
+        config = Configuration(1)
+        invoice, = invoices
         transaction = CollectTransaction()
         transaction.invoice = invoice
+        transaction.pay_date = pay_date
+        transaction.pay_amount = pay_amount
+        if journal is None:
+            journal = config.default_payment_collect_journal
+        transaction.journal = journal
         transaction.party = invoice.party
         transaction.collect_result = collect_result
         transaction.collect_message = message
@@ -141,6 +149,7 @@ class PaymentMixIn(object):
         collect.cantidad_registros = self.cantidad_registros
         collect.period = self.period
         collect.paymode_type = self.__name__
+        #collect.origin = self
         collect.type = self.type
         collect.save()
         self.collect = collect
@@ -158,7 +167,7 @@ class PaymentMixIn(object):
         attach.data = return_file.read()
         attach.save()
 
-    def return_collect(self, start):
+    def return_collect(self, start, tabla_codigos = {}):
         self.type = 'return'
         self.return_file = StringIO.StringIO(start.return_file)
         self.period = start.period
@@ -168,22 +177,5 @@ class PaymentMixIn(object):
             'rejected_invoices': [],
             }
         self.codigo_retorno = {}
+        self.tabla_codigos = tabla_codigos
         return []
-
-    def set_invoice_transaction(self, tabla_codigos):
-        Invoice = Pool().get('account.invoice')
-        accepted_invoices = Invoice.browse(self.invoices_id['accepted_invoices'])
-        rejected_invoices = Invoice.browse(self.invoices_id['rejected_invoices'])
-
-        for invoice in accepted_invoices:
-            transaction = self.message_invoice(invoice, 'A',
-                'Movimiento Aceptado')
-            transaction.collect = self.collect
-            transaction.save()
-
-        for invoice in rejected_invoices:
-            transaction = self.message_invoice(invoice, 'R',
-                tabla_codigos[self.codigo_retorno[str(invoice.id)]])
-            transaction.collect = self.collect
-            transaction.save()
-        self._add_attach_to_collect(self.collect, self.return_file)
