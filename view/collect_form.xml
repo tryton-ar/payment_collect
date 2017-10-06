@@ -13,6 +13,29 @@ copyright notices and license terms. -->
     <label name="monto_total"/>
     <field name="monto_total"/>
     <notebook>
+        <page string="Collect" id="collect">
+            <field name="attachments" colspan="4"/>
+            <group col="2" colspan="2" id="states" yfill="1">
+                <!--
+                <label name="invoice_state"/>
+                <field name="invoice_state"/>
+                -->
+                <label name="state"/>
+                <field name="state"/>
+            </group>
+            <group col="2" colspan="2" id="amount_buttons" yfill="1">
+                <group col="2" colspan="2" id="buttons">
+                    <button name="post_invoices" string="Confirm"
+                        icon="tryton-go-next"/>
+                    <button name="pay_invoices" string="Process"
+                        icon="tryton-go-next"/>
+                    <!--
+                    <button name="publish_invoices" string="Publish"
+                        icon="tryton-go-next"/>
+                    -->
+                </group>
+            </group>
+        </page>
         <page string="Attachments" id="attachments">
             <field name="attachments" colspan="4"/>
         </page>
@@ -21,9 +44,6 @@ copyright notices and license terms. -->
         </page>
         <page string="Rejected Invoices" id="rejected_invoices">
             <field name="transactions_rejected" colspan="4"/>
-        </page>
-        <page string="Process Invoices" id="process_invoices">
-            <button name="post_invoices" string="Post invoices"/>
         </page>
     </notebook>
 </form>
