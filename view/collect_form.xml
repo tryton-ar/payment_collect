@@ -27,17 +27,12 @@ copyright notices and license terms. -->
                 <group col="2" colspan="2" id="buttons">
                     <button name="post_invoices" string="Confirm"
                         icon="tryton-go-next"/>
-                    <button name="pay_invoices" string="Process"
+                    <button name="pay_invoices" string="Pay"
                         icon="tryton-go-next"/>
-                    <!--
                     <button name="publish_invoices" string="Publish"
                         icon="tryton-go-next"/>
-                    -->
                 </group>
             </group>
-        </page>
-        <page string="Attachments" id="attachments">
-            <field name="attachments" colspan="4"/>
         </page>
         <page string="Accepted Invoices" id="accepeted_invoices">
             <field name="transactions_accepted" colspan="4"/>
