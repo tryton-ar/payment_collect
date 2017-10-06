@@ -32,6 +32,31 @@ copyright notices and license terms. -->
             <field name="act_window" ref="act_payment_collect"/>
         </record>
 
+        <record model="ir.action.act_window.domain" id="act_collect_form_domain_processing">
+            <field name="name">Processing</field>
+            <field name="sequence" eval="30"/>
+            <field name="domain"
+                eval="[('state', '=', 'processing')]"
+                pyson="1"/>
+            <field name="count" eval="True"/>
+            <field name="act_window" ref="act_payment_collect"/>
+        </record>
+        <record model="ir.action.act_window.domain" id="act_collect_form_domain_confirmed">
+            <field name="name">Confirmed</field>
+            <field name="sequence" eval="40"/>
+            <field name="domain"
+                eval="[('state', '=', 'confirmed')]"
+                pyson="1"/>
+            <field name="count" eval="True"/>
+            <field name="act_window" ref="act_payment_collect"/>
+        </record>
+        <record model="ir.action.act_window.domain" id="act_collect_form_domain_all">
+            <field name="name">All</field>
+            <field name="sequence" eval="9999"/>
+            <field name="domain"></field>
+            <field name="act_window" ref="act_payment_collect"/>
+        </record>
+
         <!-- Wizard Collect -->
         <record model="ir.action.wizard" id="wizard_collect_send">
             <field name="name">Collect send</field>
