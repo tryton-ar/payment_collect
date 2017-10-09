@@ -25,7 +25,7 @@ copyright notices and license terms. -->
             </group>
             <group col="2" colspan="2" id="amount_buttons" yfill="1">
                 <group col="2" colspan="2" id="buttons">
-                    <button name="post_invoices" string="Confirm"
+                    <button name="confirm" string="Confirm"
                         icon="tryton-go-next"/>
                     <button name="pay_invoices" string="Pay"
                         icon="tryton-go-next"/>

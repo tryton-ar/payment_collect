@@ -2,14 +2,17 @@
 # This file is part of the payment_collect module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
+import logging
+import os
+import sys
 from decimal import Decimal
+
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.transaction import Transaction
 from trytond.model import Workflow, fields, ModelSQL, ModelView
 from trytond.pool import Pool
 from trytond.pyson import Eval
-import logging
-logger = logging.getLogger(__name__)
+from trytond.config import config as config_
 
 __all__ = ['Collect', 'CollectSend', 'CollectSendStart', 'CollectReturn',
            'CollectReturnStart']
@@ -20,6 +23,42 @@ STATES = [
     ('paid', 'Paid'),
     ('done', 'Done'),
     ]
+
+COLLECT_CELERY = config_.getboolean('payment_collect', 'celery', default=True)
+COLLECT_CELERY_TASK = config_.get('payment_collect', 'celery_task',
+    default='trytond.modules.payment_collect.tasks.post_invoices_execution')
+
+CELERY_AVAILABLE = False
+try:
+    from celery import Celery
+    #import celery
+    CELERY_AVAILABLE = True
+except ImportError:
+    pass
+except AttributeError:
+    # If run from within frepple we will get
+    # AttributeError: 'module' object has no attribute 'argv'
+    pass
+CELERY_CONFIG = config_.get('celery', 'config',
+    default='trytond.modules.payment_collect.celeryconfig')
+CELERY_BROKER = 'amqp://%(user)s:%(password)s@%(host)s:%(port)s/%(vhost)s' % {
+    'user': config_.get('celery', 'user', default='guest'),
+    'password': config_.get('celery', 'password', default='guest'),
+    'host': config_.get('celery', 'host', default='localhost'),
+    'port': config_.getint('celery', 'port', default=5672),
+    'vhost': config_.get('celery', 'vhost', default='/'),
+    }
+
+#celery = Celery('collect', broker='amqp://guest@localhost//')
+#celery.config_from_object({
+#    'BROKER_URL': 'amqp://localhost',
+#    'CELERY_RESULT_BACKEND': 'amqp://',
+#    'CELERYD_POOL_RESTARTS': True,  # Required for /worker/pool/restart API
+#})
+#celery.conf.TRYTON_DATABASE = 'conexionsolidaria42'
+#celery.conf.TRYTON_CONFIG = '/opt/trytond/conexionsolidaria/etc/trytond.conf'
+
+logger = logging.getLogger(__name__)
 
 class Collect(Workflow, ModelSQL, ModelView):
     'Collect'
@@ -53,7 +92,7 @@ class Collect(Workflow, ModelSQL, ModelView):
                 ('paid', 'done'),
                 ))
         cls._buttons.update({
-                'post_invoices': {
+                'confirm': {
                     'invisible': Eval('state') != 'processing',
                     'readonly': ~Eval('transactions_accepted', []),
                     },
@@ -147,16 +186,32 @@ class Collect(Workflow, ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     @Workflow.transition('confirmed')
-    def post_invoices(cls, collects):
+    def confirm(cls, collects):
         '''
-        post invoices.
+        Post accepeted invoices.
         '''
-        Invoice = Pool().get('account.invoice')
+        transaction = Transaction()
+        user = transaction.user
+        database_name = transaction.database.name
         invoices = []
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+
         for collect in collects:
-            for transaction in collect.transactions_accepted:
-                invoices.append(transaction.invoice)
-        Invoice.post(invoices)
+            if CELERY_AVAILABLE and COLLECT_CELERY:
+                os.system('%s/celery call %s --broker=%s --args=[%d,%d] --config="%s" --queue=%s' % (
+                    os.path.dirname(sys.executable),
+                    COLLECT_CELERY_TASK,
+                    CELERY_BROKER,
+                    collect.id,
+                    user,
+                    CELERY_CONFIG,
+                    database_name))
+            else:
+                # Fallback to synchronous mode if celery is not available
+                for transaction in collect.transactions_accepted:
+                    invoices.append(transaction.invoice)
+                Invoice.post(invoices)
 
     @classmethod
     @ModelView.button
