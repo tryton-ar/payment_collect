@@ -3,6 +3,8 @@
 # the full copyright notices and license terms.
 from trytond.model import fields, ModelSQL, ModelView
 from trytond.pool import Pool
+import stdnum.ar.cbu as cbu
+import stdnum.exceptions
 
 __all__ = ['PayMode']
 
@@ -24,6 +26,14 @@ class PayMode(ModelSQL, ModelView):
     credit_bank = fields.Many2One('bank', 'Credit card bank')
 
     @classmethod
+    def __setup__(cls):
+        super(PayMode, cls).__setup__()
+        cls._error_messages.update({
+                'invalid_cbu': ('Invalid CBU number "%(cbu_number)s" '
+                    'on party "%(party)s".'),
+                })
+
+    @classmethod
     def _get_origin(cls):
         'Return list of Model names for origin Reference'
         return ['']
@@ -42,3 +52,29 @@ class PayMode(ModelSQL, ModelView):
             return '['+self.type+'] '+self.party.name
         else:
             return name
+
+    @fields.depends('type', 'cbu_number')
+    def on_change_with_cbu_number(self):
+        if self.type == 'payment.paymode.bccl':
+            try:
+                return cbu.compact(self.cbu_number)
+            except stdnum.exceptions.ValidationError:
+                pass
+        return self.cbu_number
+
+    def pre_validate(self):
+        super(PayMode, self).pre_validate()
+        self.check_cbu_number()
+
+    @fields.depends('type', 'party', 'cbu_number')
+    def check_cbu_number(self):
+        if self.type == 'payment.paymode.bccl':
+            if not cbu.is_valid(self.cbu_number):
+                if self.party and self.party.id > 0:
+                    party = self.party.rec_name
+                else:
+                    party = ''
+                self.raise_user_error('invalid_cbu', {
+                        'cbu_number': self.cbu_number,
+                        'party': party,
+                        })
