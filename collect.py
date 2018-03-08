@@ -163,11 +163,17 @@ class Collect(Workflow, ModelSQL, ModelView):
         '''
         post invoices.
         '''
-        Invoice = Pool().get('account.invoice')
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        Date = pool.get('ir.date')
         invoices = []
         for collect in collects:
-            for transaction in collect.transactions_accepted:
+            transactions_to_post = [i for i in collect.transactions_accepted
+                 if i.invoice.state == 'validated']
+            for transaction in transactions_to_post:
+                transaction.invoice.invoice_date = Date.today()
                 invoices.append(transaction.invoice)
+
         Invoice.post(invoices)
 
     @classmethod
