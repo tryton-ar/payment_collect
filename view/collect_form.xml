@@ -34,7 +34,7 @@ copyright notices and license terms. -->
                 </group>
             </group>
         </page>
-        <page string="Accepted Invoices" id="accepeted_invoices">
+        <page string="Accepted Invoices" id="accepted_invoices">
             <field name="transactions_accepted" colspan="4"/>
         </page>
         <page string="Rejected Invoices" id="rejected_invoices">
@@ -42,4 +42,3 @@ copyright notices and license terms. -->
         </page>
     </notebook>
 </form>
-

@@ -7,7 +7,7 @@ from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.transaction import Transaction
 from trytond.model import Workflow, fields, ModelSQL, ModelView
 from trytond.pool import Pool
-from trytond.pyson import Eval
+from trytond.pyson import Eval, Or
 import logging
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,10 @@ class Collect(Workflow, ModelSQL, ModelView):
         ], 'Type', readonly=True)
     period = fields.Many2One('account.period', 'Period', readonly=True)
     paymode_type = fields.Char('Pay Mode', readonly=True)
-    state = fields.Selection(STATES, 'State', readonly=True, required=True)
+    state = fields.Selection(STATES, 'State', readonly=True, required=True,
+        states = {
+            'invisible': Eval('type') == 'send',
+        })
 
     @classmethod
     def __setup__(cls):
@@ -54,16 +57,25 @@ class Collect(Workflow, ModelSQL, ModelView):
                 ))
         cls._buttons.update({
                 'post_invoices': {
-                    'invisible': Eval('state') != 'processing',
+                    'invisible': Or(Eval('type') == 'send', Eval('state') != 'processing'),
                     'readonly': ~Eval('transactions_accepted', []),
                     },
                 'pay_invoices': {
-                    'invisible': Eval('state') != 'confirmed',
+                    'invisible': Or(Eval('type') == 'send', Eval('state') != 'confirmed'),
                     },
                 'publish_invoices': {
-                    'invisible': Eval('state') != 'paid',
+                    'invisible': Or(Eval('type') == 'send', Eval('state') != 'paid'),
                     },
                 })
+
+    @classmethod
+    def view_attributes(cls):
+        return [
+            ('/form//page[@id="accepted_invoices"]|/form//page[@id="rejected_invoices"]',
+                'states', {
+                    'invisible': Eval('type') == 'send',
+                })
+            ]
 
     @staticmethod
     def default_state():
