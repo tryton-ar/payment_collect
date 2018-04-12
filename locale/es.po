@@ -2,6 +2,466 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "field:payment.collect,name:"
-msgid "Name"
+msgctxt "error:payment.paymode:"
+msgid "Invalid CBU number \"%(cbu_number)s\" on party \"%(party)s\"."
+msgstr "CBU inválido: \"%(cbu_number)s\" para la entidad \"%(party)s\"."
+
+msgctxt "field:account.configuration,default_payment_collect_journal:"
+msgid "Default Payment Journal"
+msgstr "Diario de Cobranzas predeterminado"
+
+msgctxt "field:account.configuration,when_collect_payment:"
+msgid "When collect payment"
+msgstr "Cuándo cobrar"
+
+msgctxt "field:account.invoice,collect_transactions:"
+msgid "Collect Transaction"
+msgstr "Transacción de Cobranza"
+
+msgctxt "field:account.invoice,paymode:"
+msgid "Pay mode"
+msgstr "Modo de pago"
+
+msgctxt "field:party.party,customer_paymode:"
+msgid "Customer pay mode"
+msgstr "Modo de pago de Cliente"
+
+msgctxt "field:party.party,supplier_paymode:"
+msgid "Supplier pay mode"
+msgstr "Modo de pago de Proveedor"
+
+msgctxt "field:payment.collect,attachments:"
+msgid "Attachments"
+msgstr "Adjuntos"
+
+msgctxt "field:payment.collect,cantidad_registros:"
+msgid "Cantidad de registros"
 msgstr ""
+
+msgctxt "field:payment.collect,create_date:"
+msgid "Create Date"
+msgstr "Fecha de Creación"
+
+msgctxt "field:payment.collect,create_uid:"
+msgid "Create User"
+msgstr "Usuario de creación"
+
+msgctxt "field:payment.collect,id:"
+msgid "ID"
+msgstr "Identificador"
+
+msgctxt "field:payment.collect,monto_total:"
+msgid "Monto total"
+msgstr ""
+
+msgctxt "field:payment.collect,paymode_type:"
+msgid "Pay Mode"
+msgstr "Modo de pago"
+
+msgctxt "field:payment.collect,period:"
+msgid "Period"
+msgstr "Período"
+
+msgctxt "field:payment.collect,rec_name:"
+msgid "Name"
+msgstr "Nombre"
+
+msgctxt "field:payment.collect,state:"
+msgid "State"
+msgstr "Estado"
+
+msgctxt "field:payment.collect,transactions_accepted:"
+msgid "Transactions Accepted"
+msgstr "Transacciones aceptadas"
+
+msgctxt "field:payment.collect,transactions_rejected:"
+msgid "Transactions Rejected"
+msgstr "Transacciones rechazadas"
+
+msgctxt "field:payment.collect,type:"
+msgid "Type"
+msgstr "Tipo"
+
+msgctxt "field:payment.collect,write_date:"
+msgid "Write Date"
+msgstr "Fecha modificación"
+
+msgctxt "field:payment.collect,write_uid:"
+msgid "Write User"
+msgstr "Usuario modificación"
+
+msgctxt "field:payment.collect.return.start,id:"
+msgid "ID"
+msgstr "Identificador"
+
+msgctxt "field:payment.collect.return.start,pay_date:"
+msgid "Pay date"
+msgstr "Fecha de pago"
+
+msgctxt "field:payment.collect.return.start,paymode_type:"
+msgid "Pay Mode"
+msgstr "Modo de pago"
+
+msgctxt "field:payment.collect.return.start,period:"
+msgid "Period"
+msgstr "Período"
+
+msgctxt "field:payment.collect.return.start,return_file:"
+msgid "Return File"
+msgstr "Archivo de retorno"
+
+msgctxt "field:payment.collect.send.start,csv_format:"
+msgid "CSV format"
+msgstr "Formato CSV"
+
+msgctxt "field:payment.collect.send.start,expiration_date:"
+msgid "Fecha de vencimiento"
+msgstr ""
+
+msgctxt "field:payment.collect.send.start,id:"
+msgid "ID"
+msgstr "Identificador"
+
+msgctxt "field:payment.collect.send.start,paymode_type:"
+msgid "Pay Mode"
+msgstr "Modo de pago"
+
+msgctxt "field:payment.collect.send.start,period:"
+msgid "Period"
+msgstr "Período"
+
+msgctxt "field:payment.collect.transaction,amount:"
+msgid "Amount"
+msgstr "Importe"
+
+msgctxt "field:payment.collect.transaction,collect:"
+msgid "Payment Collect"
+msgstr "Cobranzas"
+
+msgctxt "field:payment.collect.transaction,collect_message:"
+msgid "Mensaje"
+msgstr ""
+
+msgctxt "field:payment.collect.transaction,collect_result:"
+msgid "Resultado"
+msgstr ""
+
+msgctxt "field:payment.collect.transaction,create_date:"
+msgid "Create Date"
+msgstr "Fecha de Creación"
+
+msgctxt "field:payment.collect.transaction,create_uid:"
+msgid "Create User"
+msgstr "Usuario de creación"
+
+msgctxt "field:payment.collect.transaction,email:"
+msgid "E-mail"
+msgstr "Correo electrónico"
+
+msgctxt "field:payment.collect.transaction,id:"
+msgid "ID"
+msgstr "Identificador"
+
+msgctxt "field:payment.collect.transaction,invoice:"
+msgid "Invoice"
+msgstr "Factura"
+
+msgctxt "field:payment.collect.transaction,invoice_state:"
+msgid "Invoice state"
+msgstr "Estado de la factura"
+
+msgctxt "field:payment.collect.transaction,journal:"
+msgid "Journal"
+msgstr "Diario"
+
+msgctxt "field:payment.collect.transaction,party:"
+msgid "Party"
+msgstr "Tercero"
+
+msgctxt "field:payment.collect.transaction,pay_amount:"
+msgid "Pay Amount"
+msgstr "Monto de pago"
+
+msgctxt "field:payment.collect.transaction,pay_date:"
+msgid "Pay Date"
+msgstr "Fecha de pago"
+
+msgctxt "field:payment.collect.transaction,phone:"
+msgid "Phone"
+msgstr "Teléfono"
+
+msgctxt "field:payment.collect.transaction,rec_name:"
+msgid "Name"
+msgstr "Nombre"
+
+msgctxt "field:payment.collect.transaction,write_date:"
+msgid "Write Date"
+msgstr "Fecha modificación"
+
+msgctxt "field:payment.collect.transaction,write_uid:"
+msgid "Write User"
+msgstr "Usuario modificación"
+
+msgctxt "field:payment.paymode,cbu_number:"
+msgid "CBU number"
+msgstr "Número de CBU"
+
+msgctxt "field:payment.paymode,create_date:"
+msgid "Create Date"
+msgstr "Fecha de Creación"
+
+msgctxt "field:payment.paymode,create_uid:"
+msgid "Create User"
+msgstr "Usuario de creación"
+
+msgctxt "field:payment.paymode,credit_bank:"
+msgid "Credit card bank"
+msgstr "Tarjeta de crédito de banco"
+
+msgctxt "field:payment.paymode,credit_expiration_date:"
+msgid "Expiration date"
+msgstr "Fecha de vencimiento"
+
+msgctxt "field:payment.paymode,credit_number:"
+msgid "Number"
+msgstr "Número"
+
+msgctxt "field:payment.paymode,id:"
+msgid "ID"
+msgstr "Identificador"
+
+msgctxt "field:payment.paymode,party:"
+msgid "Party"
+msgstr "Tercero"
+
+msgctxt "field:payment.paymode,rec_name:"
+msgid "Name"
+msgstr "Nombre"
+
+msgctxt "field:payment.paymode,type:"
+msgid "Type"
+msgstr "Tipo"
+
+msgctxt "field:payment.paymode,write_date:"
+msgid "Write Date"
+msgstr "Fecha modificación"
+
+msgctxt "field:payment.paymode,write_uid:"
+msgid "Write User"
+msgstr "Usuario modificación"
+
+msgctxt "help:payment.collect.send.start,csv_format:"
+msgid "Check this box if you want export to csv format."
+msgstr "Marque ésta casilla si desea exportar en formato CSV"
+
+msgctxt "help:payment.collect.transaction,collect_message:"
+msgid "Mensaje de error u observación"
+msgstr ""
+
+msgctxt "help:payment.collect.transaction,collect_result:"
+msgid "Resultado procesamiento de la Cobranza"
+msgstr ""
+
+msgctxt "model:ir.action,name:act_payment_collect_return"
+msgid "Returning Collects"
+msgstr "Retornos de Cobranzas"
+
+msgctxt "model:ir.action,name:act_payment_collect_send"
+msgid "Sending Collects"
+msgstr "Envíos de Cobranzas"
+
+msgctxt "model:ir.action,name:wizard_collect_return"
+msgid "Collect return"
+msgstr "Retorno de Cobranza"
+
+msgctxt "model:ir.action,name:wizard_collect_send"
+msgid "Collect send"
+msgstr "Envío de Cobranza"
+
+msgctxt "model:ir.action.act_window.domain,name:act_collect_form_domain_all"
+msgid "All"
+msgstr "Todos"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_collect_form_domain_confirmed"
+msgid "Confirmed"
+msgstr "Confirmados"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_collect_form_domain_processing"
+msgid "Processing"
+msgstr "En proceso"
+
+msgctxt "model:ir.ui.menu,name:menu_account_payment_collect"
+msgid "Payment Collect"
+msgstr "Cobranzas"
+
+msgctxt "model:ir.ui.menu,name:menu_account_payment_collect_processing"
+msgid "Processing"
+msgstr "Procesar"
+
+msgctxt "model:ir.ui.menu,name:menu_account_payment_collect_return"
+msgid "Collect return"
+msgstr "Retorno de Cobranza"
+
+msgctxt "model:ir.ui.menu,name:menu_account_payment_collect_send"
+msgid "Collect send"
+msgstr "Envío de Cobranza"
+
+msgctxt "model:ir.ui.menu,name:menu_payment_collects_return"
+msgid "Returning Collects"
+msgstr "Retornos de Cobranzas"
+
+msgctxt "model:ir.ui.menu,name:menu_payment_collects_send"
+msgid "Sending Collects"
+msgstr "Envíos de Cobranzas"
+
+msgctxt "model:payment.collect,name:"
+msgid "Collect"
+msgstr "Cobranza"
+
+msgctxt "model:payment.collect.return.start,name:"
+msgid "Collect Return Start"
+msgstr "Comienzo de Retorno de Cobranza"
+
+msgctxt "model:payment.collect.send.start,name:"
+msgid "Collect Send Start"
+msgstr "Comienzo de Envío de Cobranza"
+
+msgctxt "model:payment.collect.transaction,name:"
+msgid "Collect Transaction"
+msgstr "Transacción de Cobranzas"
+
+msgctxt "model:payment.paymode,name:"
+msgid "Paymode"
+msgstr "Modo de pago"
+
+msgctxt "selection:account.configuration,when_collect_payment:"
+msgid "Canceled"
+msgstr "Cancelado"
+
+msgctxt "selection:account.configuration,when_collect_payment:"
+msgid "Draft"
+msgstr "Borrador"
+
+msgctxt "selection:account.configuration,when_collect_payment:"
+msgid "Paid"
+msgstr "Pagada"
+
+msgctxt "selection:account.configuration,when_collect_payment:"
+msgid "Posted"
+msgstr "Contabilizado"
+
+msgctxt "selection:account.configuration,when_collect_payment:"
+msgid "Validated"
+msgstr "Validado"
+
+msgctxt "selection:payment.collect,state:"
+msgid "Confirmed"
+msgstr "Confirmado"
+
+msgctxt "selection:payment.collect,state:"
+msgid "Done"
+msgstr "Finalizado"
+
+msgctxt "selection:payment.collect,state:"
+msgid "Paid"
+msgstr "Pagado"
+
+#, fuzzy
+msgctxt "selection:payment.collect,state:"
+msgid "Processing"
+msgstr "En proceso"
+
+msgctxt "selection:payment.collect,type:"
+msgid ""
+msgstr ""
+
+msgctxt "selection:payment.collect,type:"
+msgid "Return"
+msgstr "Retorno"
+
+msgctxt "selection:payment.collect,type:"
+msgid "Send"
+msgstr "Envío"
+
+msgctxt "selection:payment.collect.transaction,collect_result:"
+msgid "Aceptado"
+msgstr ""
+
+msgctxt "selection:payment.collect.transaction,collect_result:"
+msgid "Rechazado"
+msgstr ""
+
+msgctxt "selection:payment.collect.transaction,collect_result:"
+msgid "n/a"
+msgstr ""
+
+msgctxt "view:account.configuration:"
+msgid "Payment Collect"
+msgstr "Cobranzas"
+
+msgctxt "view:account.invoice:"
+msgid "Collect Transactions"
+msgstr "Transacciones de Cobranzas"
+
+msgctxt "view:party.party:"
+msgid "Payment Method"
+msgstr "Método de pago"
+
+msgctxt "view:payment.collect.transaction:"
+msgid "Mensaje"
+msgstr ""
+
+msgctxt "view:payment.collect.transaction:"
+msgid "Party"
+msgstr "Tercero"
+
+msgctxt "view:payment.collect:"
+msgid "Accepted Invoices"
+msgstr "Facturas aceptadas"
+
+msgctxt "view:payment.collect:"
+msgid "Collect"
+msgstr "Cobranza"
+
+msgctxt "view:payment.collect:"
+msgid "Confirm"
+msgstr "Confirmar"
+
+msgctxt "view:payment.collect:"
+msgid "Pay"
+msgstr "Pagar"
+
+msgctxt "view:payment.collect:"
+msgid "Publish"
+msgstr "Publicar"
+
+msgctxt "view:payment.collect:"
+msgid "Rejected Invoices"
+msgstr "Facturas rechazadas"
+
+msgctxt "view:payment.paymode:"
+msgid "Debito"
+msgstr ""
+
+msgctxt "view:payment.paymode:"
+msgid "Tarjeta de credito"
+msgstr ""
+
+msgctxt "wizard_button:payment.collect.return,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt "wizard_button:payment.collect.return,start,return_collect:"
+msgid "Return Collect"
+msgstr "Retorno de Cobranza"
+
+#, fuzzy
+msgctxt "wizard_button:payment.collect.send,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt "wizard_button:payment.collect.send,start,generate_collect:"
+msgid "Generate Collect"
+msgstr "Generar Envío de Cobranza"
