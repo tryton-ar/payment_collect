@@ -9,6 +9,8 @@ copyright notices and license terms. -->
         <field name="when_collect_payment"/>
         <label name="default_payment_collect_journal"/>
         <field name="default_payment_collect_journal"/>
+        <label name="collect_use_cron"/>
+        <field name="collect_use_cron"/>
         <newline/>
     </xpath>
 </data>

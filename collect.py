@@ -12,7 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 __all__ = ['Collect', 'CollectSend', 'CollectSendStart', 'CollectReturn',
-           'CollectReturnStart']
+           'CollectReturnStart', 'PayInvoicesCron']
 
 STATES = [
     ('processing', 'Processing'),
@@ -45,6 +45,8 @@ class Collect(Workflow, ModelSQL, ModelView):
         states = {
             'invisible': Eval('type') == 'send',
         })
+    pay_invoices_cron = fields.Many2One('payment.collect.pay_invoices_cron',
+        'Pay Invoices Cron')
 
     @classmethod
     def __setup__(cls):
@@ -165,13 +167,12 @@ class Collect(Workflow, ModelSQL, ModelView):
         '''
         pool = Pool()
         Invoice = pool.get('account.invoice')
-        Date = pool.get('ir.date')
         invoices = []
         for collect in collects:
             transactions_to_post = [i for i in collect.transactions_accepted
                  if i.invoice.state == 'validated']
             for transaction in transactions_to_post:
-                transaction.invoice.invoice_date = Date.today()
+                transaction.invoice.invoice_date = None
                 invoices.append(transaction.invoice)
 
         Invoice.post(invoices)
@@ -183,9 +184,19 @@ class Collect(Workflow, ModelSQL, ModelView):
         '''
         pay invoices.
         '''
-        for collect in collects:
-            for transaction in collect.transactions_accepted:
-                cls.pay_invoice(transaction)
+        pool = Pool()
+        Configuration = pool.get('account.configuration')
+        config = Configuration(1)
+        if config.collect_use_cron:
+            PayInvoicesCron = pool.get('payment.collect.pay_invoices_cron')
+            pay_invoices_cron = PayInvoicesCron()
+            pay_invoices_cron.collects = collects
+            pay_invoices_cron.paid = False
+            pay_invoices_cron.save()
+        else:
+            for collect in collects:
+                for transaction in collect.transactions_accepted:
+                    cls.pay_invoice(transaction)
 
     @classmethod
     @ModelView.button
@@ -305,3 +316,37 @@ class CollectReturn(Wizard):
         if len(collects) == 1:
             action['views'].reverse()
         return action, data
+
+
+class PayInvoicesCron(ModelSQL, ModelView):
+    'Pay Invoices Cron'
+    __name__ = 'payment.collect.pay_invoices_cron'
+
+    collects = fields.One2Many('payment.collect', 'pay_invoices_cron', 'Collects')
+    paid = fields.Boolean('Paid')
+
+    @classmethod
+    def pay_invoices_cron(cls, args=None):
+        '''
+        Cron to pay invoices.
+        '''
+        logger.info('Start Scheduler - pay invoices.')
+        pay_invoices_cron_data = []
+        pay_invoices_cron_data = cls.search(['paid', '=', False])
+        if pay_invoices_cron_data != []:
+            pay_invoices_cron_data = pay_invoices_cron_data[0]
+        if pay_invoices_cron_data and pay_invoices_cron_data.collects:
+            logger.info('Pay invoices - processing collects transactions')
+            for collect in pay_invoices_cron_data.collects:
+                for transaction in collect.transactions_accepted:
+                    if transaction.invoice.state == 'posted':
+                        collect.pay_invoice(transaction)
+                        logger.debug('Pay invoices - Invoice: %s paid', transaction.invoice.id)
+
+            logger.info('Pay invoices - Invoices paid')
+            pay_invoices_cron_data.paid = True
+            pay_invoices_cron_data.save()
+        else:
+            logger.info('Pay invoices - no collects pending')
+
+        logger.info('End Scheduler - Pay invoices')
