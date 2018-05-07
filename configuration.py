@@ -15,3 +15,4 @@ class Configuration:
         fields.Many2One('account.journal', 'Default Payment Journal'))
     when_collect_payment = fields.Property(
         fields.Selection(STATES, 'When collect payment'))
+    collect_use_cron = fields.Boolean('Use Cron to pay invoices')

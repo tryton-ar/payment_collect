@@ -13,6 +13,7 @@ def register():
     Pool.register(
         party.Party,
         paymode.PayMode,
+        collect.PayInvoicesCron,
         collect.Collect,
         collect.CollectSendStart,
         collect.CollectReturnStart,
