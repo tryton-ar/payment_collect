@@ -1,10 +1,11 @@
 # This file is part of the payment_collect module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
+from stdnum.ar import cbu
+
 from trytond.model import fields, ModelSQL, ModelView
 from trytond.pool import Pool
-import stdnum.ar.cbu as cbu
-import stdnum.exceptions
+from trytond.pyson import Eval
 
 __all__ = ['PayMode']
 
@@ -19,6 +20,14 @@ class PayMode(ModelSQL, ModelView):
 
     ## DEBIT
     cbu_number = fields.Char('CBU number')
+    bank_account = fields.Many2One('bank.account',
+        'Bank Account', context={
+            'owners': Eval('party'),
+            'numbers.type': 'cbu',
+            }, domain=[
+            ('owners', '=', Eval('party')),
+            ('numbers.type', '=', 'cbu'),
+            ])
     ## CREDIT
     #credit_paymode = fields.Selection('get_credit_paymode', 'Type')
     credit_number = fields.Char('Number')
@@ -29,8 +38,7 @@ class PayMode(ModelSQL, ModelView):
     def __setup__(cls):
         super(PayMode, cls).__setup__()
         cls._error_messages.update({
-                'invalid_cbu': ('Invalid CBU number "%(cbu_number)s" '
-                    'on party "%(party)s".'),
+                'invalid_cbu': 'Invalid CBU "%s".',
                 })
 
     @classmethod
@@ -49,32 +57,14 @@ class PayMode(ModelSQL, ModelView):
 
     def get_rec_name(self, name):
         if self.type and self.party:
-            return '['+self.type+'] '+self.party.name
+            return '[%s] %s' % (Pool().get(self.type).__doc__,
+                self.party.rec_name)
         else:
             return name
 
-    @fields.depends('type', 'cbu_number')
-    def on_change_with_cbu_number(self):
-        if self.type == 'payment.paymode.bccl':
-            try:
-                return cbu.compact(self.cbu_number)
-            except stdnum.exceptions.ValidationError:
-                pass
-        return self.cbu_number
-
+    @fields.depends('bank_account', 'type')
     def pre_validate(self):
         super(PayMode, self).pre_validate()
-        self.check_cbu_number()
-
-    @fields.depends('type', 'party', 'cbu_number')
-    def check_cbu_number(self):
-        if self.type == 'payment.paymode.bccl':
-            if not cbu.is_valid(self.cbu_number):
-                if self.party and self.party.id > 0:
-                    party = self.party.rec_name
-                else:
-                    party = ''
-                self.raise_user_error('invalid_cbu', {
-                        'cbu_number': self.cbu_number,
-                        'party': party,
-                        })
+        if (self.type == 'payment.paymode.bccl' and self.bank_account
+                and not cbu.is_valid(self.bank_account.rec_name)):
+            self.raise_user_error('invalid_cbu', self.bank_account.rec_name)
