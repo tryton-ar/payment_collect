@@ -3,6 +3,8 @@
 copyright notices and license terms. -->
 <tryton>
     <data>
+        <menuitem name="Payments Collect" parent="account.menu_account_configuration"
+            id="menu_payment_collect" sequence="30"/>
 
         <record model="ir.ui.view" id="paymode_view_tree">
             <field name="model">payment.paymode</field>
@@ -15,5 +17,22 @@ copyright notices and license terms. -->
             <field name="name">paymode_form</field>
         </record>
 
+        <record model="ir.action.act_window" id="act_paymode_form">
+            <field name="name">Paymodes collect</field>
+            <field name="res_model">payment.paymode</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_paymode_form_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="paymode_view_tree"/>
+            <field name="act_window" ref="act_paymode_form"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_paymode_form_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="paymode_view_form"/>
+            <field name="act_window" ref="act_paymode_form"/>
+        </record>
+
+        <menuitem parent="menu_payment_collect" action="act_paymode_form"
+            id="menu_paymode_collect" sequence="5"/>
     </data>
 </tryton>

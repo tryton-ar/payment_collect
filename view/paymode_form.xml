@@ -8,10 +8,8 @@ copyright notices and license terms. -->
     <field name="type"/>
     <notebook>
         <page string="Debito" id="debit">
-            <!--
             <label name="cbu_number"/>
             <field name="cbu_number"/>
-            -->
             <label name="bank_account"/>
             <field name="bank_account"/>
         </page>
