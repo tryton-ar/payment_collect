@@ -19,17 +19,15 @@ class PaymentMixIn(object):
     csv_format = False
     monto_total = Decimal('0')
     cantidad_registros = 0
-    paymode_type = res = period = type = None
+    filename = paymode_type = res = period = type = None
     #journal = 'CASH'
 
     def attach_collect(self):
         pool = Pool()
         Attachment = pool.get('ir.attachment')
         collect = self.create_collect()
-        filename = collect.paymode_type + '-' + self.type + '-' + \
-            datetime.date.today().strftime("%Y-%m-%d")
         attach = Attachment()
-        attach.name = filename + '.txt'
+        attach.name = '%s' % self.filename
         attach.resource = collect
         attach.data = ''.join(self.res)
         attach.save()
@@ -179,3 +177,18 @@ class PaymentMixIn(object):
         self.codigo_retorno = {}
         self.tabla_codigos = tabla_codigos
         return []
+
+    def get_format_date(self):
+        pool = Pool()
+        Lang = pool.get('ir.lang')
+        return lambda value: Lang.strftime(value, 'es_AR', '%d/%m/%Y')
+
+    def get_format_number(self):
+        pool = Pool()
+        Lang = pool.get('ir.lang')
+        es_419 = Lang(
+            decimal_point=',',
+            thousands_sep='.',
+            grouping='[]',
+            )
+        return lambda value: Lang.format(es_419, '%.2f', value)
