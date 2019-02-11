@@ -50,10 +50,7 @@ class PaymentMixIn(object):
 
     @classmethod
     def get_order(cls):
-        return [
-                ('invoice_date', 'ASC'),
-                ('id', 'ASC')
-            ]
+        return [('invoice_date', 'ASC'), ('id', 'ASC')]
 
     def lista_campo_ordenados(self):
         """ Devuelve lista de campos ordenados """
@@ -90,7 +87,7 @@ class PaymentMixIn(object):
 
     @classmethod
     def pay_invoice(cls, invoice, amount_to_pay, pay_date=None, journal=None):
-        logger.info("PAY INVOICE: invoice_id: "+repr(invoice.number))
+        logger.info("PAY INVOICE: invoice_id: %s" % repr(invoice.number))
         # Pagar la invoice
         pool = Pool()
         Currency = pool.get('currency.currency')
@@ -104,10 +101,6 @@ class PaymentMixIn(object):
         with Transaction().set_context(date=pay_date):
             amount = Currency.compute(invoice.currency,
                 amount_to_pay, invoice.company.currency)
-
-        # FIXME migrate 4.0?
-        #if invoice.type in ('in_invoice', 'out_credit_note'):
-        #    amount = -amount
 
         reconcile_lines, remainder = \
             invoice.get_reconcile_lines_for_amount(amount)
@@ -165,7 +158,7 @@ class PaymentMixIn(object):
         attach.data = return_file.read()
         attach.save()
 
-    def return_collect(self, start, tabla_codigos = {}):
+    def return_collect(self, start, tabla_codigos={}):
         self.type = 'return'
         self.return_file = StringIO.StringIO(start.return_file)
         self.period = start.period

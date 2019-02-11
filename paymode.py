@@ -18,7 +18,7 @@ class PayMode(ModelSQL, ModelView):
         required=True, select=True)
     type = fields.Selection('get_origin', 'Type')
 
-    ## DEBIT
+    # DEBIT
     cbu_number = fields.Char('CBU number')
     bank_account = fields.Many2One('bank.account',
         'Bank Account', context={
@@ -28,7 +28,7 @@ class PayMode(ModelSQL, ModelView):
             ('owners', '=', Eval('party')),
             ('numbers.type', '=', 'cbu'),
             ])
-    ## CREDIT
+    # CREDIT
     #credit_paymode = fields.Selection('get_credit_paymode', 'Type')
     credit_number = fields.Char('Number')
     credit_expiration_date = fields.Date('Expiration date')
@@ -65,6 +65,6 @@ class PayMode(ModelSQL, ModelView):
     @fields.depends('bank_account', 'type')
     def pre_validate(self):
         super(PayMode, self).pre_validate()
-        if (self.type == 'payment.paymode.bccl' and self.bank_account
-                and not cbu.is_valid(self.bank_account.rec_name)):
+        if (self.type == 'payment.paymode.bccl' and self.bank_account and not
+                cbu.is_valid(self.bank_account.rec_name)):
             self.raise_user_error('invalid_cbu', self.bank_account.rec_name)

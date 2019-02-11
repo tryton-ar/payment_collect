@@ -18,9 +18,8 @@ class CollectTransaction(ModelSQL, ModelView):
     collect_result = fields.Selection([
            ('', 'n/a'),
            ('A', 'Aceptado'),
-           ('R', 'Rechazado'),
-       ], 'Resultado', readonly=True,
-       help=u"Resultado procesamiento de la Cobranza")
+           ('R', 'Rechazado')], 'Resultado', readonly=True,
+        help=u"Resultado procesamiento de la Cobranza")
     collect_message = fields.Text('Mensaje', readonly=True,
                                   help=u"Mensaje de error u observación")
     invoice = fields.Many2One('account.invoice', 'Invoice', readonly=True)

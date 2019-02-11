@@ -21,6 +21,7 @@ STATES = [
     ('done', 'Done'),
     ]
 
+
 class Collect(Workflow, ModelSQL, ModelView):
     'Collect'
     __name__ = 'payment.collect'
@@ -41,8 +42,8 @@ class Collect(Workflow, ModelSQL, ModelView):
         ], 'Type', readonly=True)
     period = fields.Many2One('account.period', 'Period', readonly=True)
     paymode_type = fields.Char('Pay Mode', readonly=True)
-    state = fields.Selection(STATES, 'State', readonly=True, required=True,
-        states = {
+    state = fields.Selection(STATES, 'State', readonly=True,
+        required=True, states={
             'invisible': Eval('type') == 'send',
         })
     pay_invoices_cron = fields.Many2One('payment.collect.pay_invoices_cron',
@@ -59,14 +60,17 @@ class Collect(Workflow, ModelSQL, ModelView):
                 ))
         cls._buttons.update({
                 'post_invoices': {
-                    'invisible': Or(Eval('type') == 'send', Eval('state') != 'processing'),
+                    'invisible': Or(Eval('type') == 'send',
+                        Eval('state') != 'processing'),
                     'readonly': ~Eval('transactions_accepted', []),
                     },
                 'pay_invoices': {
-                    'invisible': Or(Eval('type') == 'send', Eval('state') != 'confirmed'),
+                    'invisible': Or(Eval('type') == 'send',
+                        Eval('state') != 'confirmed'),
                     },
                 'publish_invoices': {
-                    'invisible': Or(Eval('type') == 'send', Eval('state') != 'paid'),
+                    'invisible': Or(Eval('type') == 'send',
+                        Eval('state') != 'paid'),
                     },
                 })
 
@@ -301,7 +305,8 @@ class CollectReturn(Wizard):
         'payment.collect.return.start',
         'payment_collect.collect_return_start_view', [
             Button('Cancel', 'end', 'tryton-cancel'),
-            Button('Return Collect', 'return_collect', 'tryton-ok', default=True),
+            Button('Return Collect', 'return_collect', 'tryton-ok',
+                default=True),
         ])
     return_collect = StateAction(
         'payment_collect.act_payment_collect_return')
@@ -322,7 +327,8 @@ class PayInvoicesCron(ModelSQL, ModelView):
     'Pay Invoices Cron'
     __name__ = 'payment.collect.pay_invoices_cron'
 
-    collects = fields.One2Many('payment.collect', 'pay_invoices_cron', 'Collects')
+    collects = fields.One2Many('payment.collect', 'pay_invoices_cron',
+        'Collects')
     paid = fields.Boolean('Paid')
 
     @classmethod
@@ -341,7 +347,8 @@ class PayInvoicesCron(ModelSQL, ModelView):
                 for transaction in collect.transactions_accepted:
                     if transaction.invoice.state == 'posted':
                         collect.pay_invoice(transaction)
-                        logger.debug('Pay invoices - Invoice: %s paid', transaction.invoice.id)
+                        logger.debug('Pay invoices - Invoice: %s paid',
+                            transaction.invoice.id)
 
             logger.info('Pay invoices - Invoices paid')
             pay_invoices_cron_data.paid = True
