@@ -4,7 +4,7 @@
 # the full copyright notices and license terms.
 from decimal import Decimal
 import datetime
-import StringIO
+import io
 from trytond.pool import Pool
 from trytond.transaction import Transaction
 import logging
@@ -160,7 +160,7 @@ class PaymentMixIn(object):
 
     def return_collect(self, start, tabla_codigos={}):
         self.type = 'return'
-        self.return_file = StringIO.StringIO(start.return_file)
+        self.return_file = io.StringIO(start.return_file)
         self.period = start.period
         self.create_collect()
         self.invoices_id = {

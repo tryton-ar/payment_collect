@@ -19,9 +19,9 @@ class CollectTransaction(ModelSQL, ModelView):
            ('', 'n/a'),
            ('A', 'Aceptado'),
            ('R', 'Rechazado')], 'Resultado', readonly=True,
-        help=u"Resultado procesamiento de la Cobranza")
+        help="Resultado procesamiento de la Cobranza")
     collect_message = fields.Text('Mensaje', readonly=True,
-                                  help=u"Mensaje de error u observación")
+                                  help="Mensaje de error u observación")
     invoice = fields.Many2One('account.invoice', 'Invoice', readonly=True)
     collect = fields.Many2One('payment.collect', 'Payment Collect')
     party = fields.Function(fields.Many2One('party.party', 'Party',
@@ -53,13 +53,12 @@ class CollectTransaction(ModelSQL, ModelView):
         return self.invoice.total_amount
 
 
-class Invoice:
-    __metaclass__ = PoolMeta
+class Invoice(metaclass=PoolMeta):
     __name__ = 'account.invoice'
 
     collect_transactions = fields.One2Many(
         'payment.collect.transaction',
-        'invoice', u"Collect Transaction",
+        'invoice', "Collect Transaction",
         readonly=True)
 
     paymode = fields.Many2One(
