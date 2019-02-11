@@ -26,11 +26,11 @@ copyright notices and license terms. -->
             <group col="2" colspan="2" id="amount_buttons" yfill="1">
                 <group col="2" colspan="2" id="buttons">
                     <button name="post_invoices" string="Confirm"
-                        icon="tryton-go-next"/>
+                        icon="tryton-forward"/>
                     <button name="pay_invoices" string="Pay"
-                        icon="tryton-go-next"/>
+                        icon="tryton-forward"/>
                     <button name="publish_invoices" string="Publish"
-                        icon="tryton-go-next"/>
+                        icon="tryton-forward"/>
                 </group>
             </group>
         </page>

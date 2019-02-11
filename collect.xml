@@ -114,10 +114,10 @@ copyright notices and license terms. -->
             id="menu_account_payment_collect_processing" sequence="50"/>
         <menuitem parent="menu_account_payment_collect_processing"
             action="wizard_collect_send"
-            id="menu_account_payment_collect_send" icon="tryton-executable"/>
+            id="menu_account_payment_collect_send" icon="tryton-launch"/>
         <menuitem parent="menu_account_payment_collect_processing"
             action="wizard_collect_return"
-            id="menu_account_payment_collect_return" icon="tryton-executable"/>
+            id="menu_account_payment_collect_return" icon="tryton-launch"/>
 
         <record model="res.user" id="user_invoices_pay_cron">
             <field name="login">user_invoices_pay_cron</field>
