@@ -62,6 +62,12 @@ class PayMode(ModelSQL, ModelView):
         else:
             return name
 
+    @classmethod
+    def search_rec_name(cls, name, clause):
+        return [
+            ('party.name',) + tuple(clause[1:]),
+            ]
+
     @fields.depends('bank_account', 'type')
     def pre_validate(self):
         super(PayMode, self).pre_validate()
