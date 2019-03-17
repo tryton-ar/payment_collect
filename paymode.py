@@ -62,6 +62,17 @@ class PayMode(ModelSQL, ModelView):
         else:
             return name
 
+    @classmethod
+    def search_rec_name(cls, name, clause):
+        if clause[1].startswith('!') or clause[1].startswith('not '):
+            bool_op = 'AND'
+        else:
+            bool_op = 'OR'
+        return [bool_op,
+            ('party.name',) + tuple(clause[1:]),
+            ('party.code',) + tuple(clause[1:]),
+            ]
+
     @fields.depends('bank_account', 'type')
     def pre_validate(self):
         super(PayMode, self).pre_validate()
