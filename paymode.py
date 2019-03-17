@@ -64,8 +64,13 @@ class PayMode(ModelSQL, ModelView):
 
     @classmethod
     def search_rec_name(cls, name, clause):
-        return [
+        if clause[1].startswith('!') or clause[1].startswith('not '):
+            bool_op = 'AND'
+        else:
+            bool_op = 'OR'
+        return [bool_op,
             ('party.name',) + tuple(clause[1:]),
+            ('party.code',) + tuple(clause[1:]),
             ]
 
     @fields.depends('bank_account', 'type')
