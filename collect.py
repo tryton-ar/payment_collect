@@ -221,11 +221,15 @@ class CollectSendStart(ModelView):
     'Collect Send Start'
     __name__ = 'payment.collect.send.start'
 
-    csv_format = fields.Boolean('CSV format',
+    csv_format = fields.Boolean('CSV format?',
         help='Check this box if you want export to csv format.')
     period = fields.Many2One('account.period', 'Period', required=True)
     expiration_date = fields.Date('Fecha de vencimiento')
     paymode_type = fields.Selection('get_origin', 'Pay Mode')
+
+    @staticmethod
+    def default_csv_format():
+        return False
 
     @classmethod
     def _get_origin(cls):
@@ -277,8 +281,8 @@ class CollectReturnStart(ModelView):
     pay_date = fields.Date('Pay date')
     period = fields.Many2One('account.period', 'Period', required=True)
 
-    @classmethod
-    def default_csv_format(cls):
+    @staticmethod
+    def default_pay_date():
         Date = Pool().get('ir.date')
         return Date.today()
 

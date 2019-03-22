@@ -3,10 +3,30 @@
 this repository contains the full copyright notices and license terms. -->
 <tryton>
     <data>
-        <record model="ir.ui.view" id="configuration_view_form">
-            <field name="model">account.configuration</field>
-            <field name="inherit" ref="account.configuration_view_form"/>
+        <record model="ir.ui.view" id="payment_collect_configuration_view_form">
+            <field name="model">payment_collect.configuration</field>
+            <field name="type">form</field>
             <field name="name">configuration_form</field>
+        </record>
+        <record model="ir.action.act_window" id="act_payment_collect_configuration_form">
+            <field name="name">Payment Collect Configuration</field>
+            <field name="res_model">payment_collect.configuration</field>
+        </record>
+        <record model="ir.action.act_window.view"
+            id="act_payment_collect_configuration_view1">
+            <field name="sequence" eval="1"/>
+            <field name="view" ref="payment_collect_configuration_view_form"/>
+            <field name="act_window" ref="act_payment_collect_configuration_form"/>
+        </record>
+
+        <menuitem parent="account.menu_account_configuration"
+            action="act_payment_collect_configuration_form"
+            id="menu_payment_collect_configuration"
+            sequence="0" icon="tryton-list"/>
+        <record model="ir.ui.menu-res.group"
+            id="menu_configuration_group_payment_collect_admin">
+            <field name="menu" ref="menu_payment_collect_configuration"/>
+            <field name="group" ref="group_payment_collect_admin"/>
         </record>
     </data>
 </tryton>

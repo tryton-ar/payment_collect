@@ -1,16 +1,12 @@
 <?xml version="1.0"?>
 <!-- The COPYRIGHT file at the top level of this repository contains the full
 copyright notices and license terms. -->
-<data>
-    <xpath expr="/form"
-        position="inside">
-        <separator id="payment_collect" string="Payment Collect" colspan="4"/>
-        <label name="when_collect_payment"/>
-        <field name="when_collect_payment"/>
-        <label name="default_payment_collect_journal"/>
-        <field name="default_payment_collect_journal"/>
-        <label name="collect_use_cron"/>
-        <field name="collect_use_cron"/>
-        <newline/>
-    </xpath>
-</data>
+<form>
+    <label name="journal"/>
+    <field name="journal"/>
+    <label name="when_collect_payment"/>
+    <field name="when_collect_payment"/>
+    <label name="collect_use_cron"/>
+    <field name="collect_use_cron"/>
+    <newline/>
+</form>

@@ -12,6 +12,7 @@ from . import configuration
 def register():
     Pool.register(
         party.Party,
+        party.PartyPayMode,
         paymode.PayMode,
         collect.PayInvoicesCron,
         collect.Collect,
@@ -20,6 +21,7 @@ def register():
         invoice.CollectTransaction,
         invoice.Invoice,
         configuration.Configuration,
+        configuration.ConfigurationPaymentCollectAccount,
         module='payment_collect', type_='model')
     Pool.register(
         collect.CollectSend,
