@@ -27,7 +27,7 @@ class PayMode(ModelSQL, ModelView):
             }, domain=[
             ('owners', '=', Eval('party')),
             ('numbers.type', '=', 'cbu'),
-            ])
+            ], depends=['party'])
     # CREDIT
     #credit_paymode = fields.Selection('get_credit_paymode', 'Type')
     credit_number = fields.Char('Number')

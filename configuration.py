@@ -3,6 +3,7 @@
 # the full copyright notices and license terms.
 from trytond.model import ModelView, ModelSQL, ModelSingleton, fields
 from trytond.model import MultiValueMixin, ValueMixin
+from trytond.pool import Pool
 from trytond import backend
 from trytond.tools.multivalue import migrate_property
 from trytond.pyson import Eval
@@ -10,8 +11,7 @@ from trytond.modules.account_invoice.invoice import STATES
 from trytond.modules.company.model import (
     CompanyMultiValueMixin, CompanyValueMixin)
 
-__all__ = ['Configuration', 'ConfigurationPaymentCollectAccount',
-    'ConfigurationReceiptAccount']
+__all__ = ['Configuration', 'ConfigurationPaymentCollectAccount']
 
 
 class Configuration(
@@ -26,7 +26,7 @@ class Configuration(
     when_collect_payment = fields.MultiValue(
         fields.Selection(STATES, 'When collect payment'))
     collect_use_cron = fields.MultiValue(
-        fields.Boolean('Use Cron to pay invoices')
+        fields.Boolean('Use Cron to pay invoices'))
 
     @classmethod
     def multivalue_model(cls, field):
@@ -34,9 +34,9 @@ class Configuration(
         if field == 'when_collect_payment':
             return pool.get('payment_collect.configuration.account')
         elif field == 'journal':
-            return pool.get('payment_collect.configuration..account')
+            return pool.get('payment_collect.configuration.account')
         elif field == 'collect_use_cron':
-            return pool.get('payment_collect.configuration..account')
+            return pool.get('payment_collect.configuration.account')
         return super(Configuration, cls).multivalue_model(field)
 
     @classmethod
