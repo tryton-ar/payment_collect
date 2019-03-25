@@ -29,21 +29,20 @@ class PaymentMixIn(object):
         attach = Attachment()
         attach.name = '%s' % self.filename
         attach.resource = collect
-        attach.data = ''.join(self.res)
+        attach.data = ''.join(self.res).encode('utf8')
         attach.save()
         return collect
 
     @classmethod
     def get_domain(cls, period):
-        Config = Pool().get('account.configuration')
+        Config = Pool().get('payment_collect.configuration')
         config = Config(1)
         invoice_type = ['out']
 
         domain = [
             ('state', 'in', [config.when_collect_payment]),
             ('type', 'in', invoice_type),
-            ('invoice_date', '>=', period.start_date),
-            ('invoice_date', '<=', period.end_date),
+            ('move.period', '=', period),
             ]
 
         return domain
@@ -174,7 +173,8 @@ class PaymentMixIn(object):
     def get_format_date(self):
         pool = Pool()
         Lang = pool.get('ir.lang')
-        return lambda value: Lang.strftime(value, 'es_AR', '%d/%m/%Y')
+        es_419 = Lang(code='es_419')
+        return lambda value: es_419.strftime(value, '%d/%m/%Y')
 
     def get_format_number(self):
         pool = Pool()
@@ -184,4 +184,4 @@ class PaymentMixIn(object):
             thousands_sep='.',
             grouping='[]',
             )
-        return lambda value: Lang.format(es_419, '%.2f', value)
+        return lambda value: es_419.format('%.2f', value)
