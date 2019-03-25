@@ -36,8 +36,10 @@ class PartyPayMode(ModelSQL, ValueMixin):
     __name__ = 'party.party.paymode'
     party = fields.Many2One(
         'party.party', "Party", ondelete='CASCADE', select=True)
-    customer_paymode = customer_paymode
-    supplier_paymode = supplier_paymode
+    customer_paymode = fields.Many2One('payment.paymode',
+        string='Customer pay mode', ondelete='CASCADE')
+    supplier_paymode = fields.Many2One('payment.paymode',
+        string='Supplier pay mode', ondelete='CASCADE')
 
     @classmethod
     def __register__(cls, module_name):

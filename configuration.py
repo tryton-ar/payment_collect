@@ -21,7 +21,7 @@ class Configuration(
     journal = fields.MultiValue(fields.Many2One(
             'account.journal', "Journal", required=True,
             domain=[
-                ('type', '=', 'revenue'),
+                ('type', '=', 'cash'),
                 ]))
     when_collect_payment = fields.MultiValue(
         fields.Selection(STATES, 'When collect payment'))
@@ -57,7 +57,7 @@ class ConfigurationPaymentCollectAccount(ModelSQL, CompanyValueMixin):
     journal = fields.Many2One(
         'account.journal', "Journal",
         domain=[
-            ('type', '=', 'revenue'),
+            ('type', '=', 'cash'),
             ])
     when_collect_payment = fields.Char('when_collect_payment')
     collect_use_cron = fields.Boolean('collect_use_cron')
