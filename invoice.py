@@ -63,9 +63,10 @@ class Invoice(metaclass=PoolMeta):
 
     paymode = fields.Many2One(
         'payment.paymode',
-        'Pay mode', domain=[('party', '=', Eval('party'))], states={
+        'Pay mode', domain=[('party', '=', Eval('party', None))],
+        states={
             'readonly': Not(Bool(Eval('state').in_(['draft', 'validated']))),
-        }, depends=['party', 'state'])
+        }, depends=['state', 'party'])
 
     def __get_paymode(self):
         '''
@@ -77,7 +78,6 @@ class Invoice(metaclass=PoolMeta):
             if (self.type == 'in' and self.party.supplier_paymode):
                 self.paymode = self.party.supplier_paymode
 
-    @fields.depends('party', 'payment_term', 'type', 'company', 'paymode')
     def on_change_party(self):
         super(Invoice, self).on_change_party()
         self.paymode = None
@@ -121,4 +121,5 @@ class Invoice(metaclass=PoolMeta):
         else:
             default = default.copy()
         default['collect_transactions'] = None
+        default['paymode'] = None
         return super(Invoice, cls).copy(invoices, default=default)
