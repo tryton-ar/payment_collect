@@ -8,12 +8,12 @@ from trytond.modules.company.model import CompanyValueMixin
 __all__ = ['PartyPayMode', 'Party']
 customer_paymode = fields.Many2One('payment.paymode', 'Customer pay mode',
     domain=[('party', '=', Eval('id'))], context={
-        'party': Eval('party', None),
-        }, depends=['id', 'party'])
+        'party': Eval('id', None),
+        }, depends=['id'])
 supplier_paymode = fields.Many2One('payment.paymode', 'Supplier pay mode',
     domain=[('party', '=', Eval('id'))], context={
-        'party': Eval('party', None),
-        }, depends=['id', 'party'])
+        'party': Eval('id', None),
+        }, depends=['id'])
 
 
 

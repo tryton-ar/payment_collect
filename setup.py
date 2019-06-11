@@ -43,6 +43,7 @@ for dep in info.get('depends', []):
     if not re.match(r'(ir|res)(\W|$)', dep):
         requires.append(get_require_version('trytond_%s' % dep))
 requires.append(get_require_version('trytond'))
+requires.append('card_identifier')
 
 tests_require = [get_require_version('proteus')]
 dependency_links = []

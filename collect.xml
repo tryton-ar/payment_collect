@@ -126,6 +126,17 @@ copyright notices and license terms. -->
             <field name="group" ref="account.group_account"/>
         </record>
 
+        <record model="ir.model.button" id="payment_collect_create_invoices_button">
+            <field name="name">create_invoices</field>
+            <field name="string">Create Invoices</field>
+            <field name="model" search="[('model', '=', 'payment.collect')]"/>
+        </record>
+        <record model="ir.model.button-res.group"
+            id="payment_collect_create_inovices_button_group_account">
+            <field name="button" ref="payment_collect_create_invoices_button"/>
+            <field name="group" ref="account.group_account"/>
+        </record>
+
         <!-- Wizard Collect -->
         <record model="ir.action.wizard" id="wizard_collect_send">
             <field name="name">Collect send</field>
