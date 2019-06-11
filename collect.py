@@ -15,6 +15,7 @@ __all__ = ['Collect', 'CollectSend', 'CollectSendStart', 'CollectReturn',
            'CollectReturnStart', 'PayInvoicesCron']
 
 STATES = [
+    ('invoicing', 'Invoicing'),
     ('processing', 'Processing'),
     ('confirmed', 'Confirmed'),
     ('paid', 'Paid'),
@@ -48,17 +49,25 @@ class Collect(Workflow, ModelSQL, ModelView):
         })
     pay_invoices_cron = fields.Many2One('payment.collect.pay_invoices_cron',
         'Pay Invoices Cron')
+    create_invoices = fields.Boolean('Create invoices', readonly=True,
+        help='Check this box if you create invoices when process return.')
 
     @classmethod
     def __setup__(cls):
         super(Collect, cls).__setup__()
         cls._transitions |= set((
+                ('invoicing', 'processing'),
                 ('processing', 'processing'),
                 ('processing', 'confirmed'),
                 ('confirmed', 'paid'),
                 ('paid', 'done'),
                 ))
         cls._buttons.update({
+                'create_invoices': {
+                    'invisible': Or(Eval('type') == 'send',
+                        Eval('create_invoices', False)),
+                    'readonly': Eval('cantidad_registros', 0) == 0,
+                    },
                 'post_invoices': {
                     'invisible': Or(Eval('type') == 'send',
                         Eval('state') != 'processing'),
@@ -215,6 +224,15 @@ class Collect(Workflow, ModelSQL, ModelView):
             for transaction in collect.transactions_accepted:
                 invoices.append(transaction.invoice)
         InvoiceReport.execute([i.id for i in invoices], {})
+
+    @classmethod
+    @ModelView.button
+    @Workflow.transition('processing')
+    def create_invoices(cls, collects):
+        '''
+        create invoices.
+        '''
+        pass
 
 
 class CollectSendStart(ModelView):
