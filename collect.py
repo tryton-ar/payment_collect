@@ -30,12 +30,16 @@ class Collect(Workflow, ModelSQL, ModelView):
     monto_total = fields.Numeric('Monto total', digits=(16, 2), readonly=True)
     cantidad_registros = fields.Integer('Cantidad de registros', readonly=True)
     attachments = fields.One2Many('ir.attachment', 'resource', 'Attachments')
-    transactions_accepted = fields.Function(fields.One2Many(
-        'payment.collect.transaction', None,
-        'Transactions Accepted'), 'get_transactions_accepted')
-    transactions_rejected = fields.Function(fields.One2Many(
-        'payment.collect.transaction', None,
-        'Transactions Rejected'), 'get_transactions_rejected')
+    transactions_accepted = fields.One2Many('payment.collect.transaction',
+        'collect','Accepted transactions', filter=[
+            ('collect_result', '=', 'A'),
+            ('invoice', '!=', None),
+            ], readonly=True)
+    transactions_rejected = fields.One2Many('payment.collect.transaction',
+        'collect','Rejected transactions', filter=[
+            ('collect_result', '=', 'R'),
+            ('invoice', '!=', None),
+            ], readonly=True)
     type = fields.Selection([
         (None, ''),
         ('send', 'Send'),
@@ -100,26 +104,6 @@ class Collect(Workflow, ModelSQL, ModelView):
         if self.paymode_type:
             name = self.paymode_type
         return name
-
-    def get_transactions_accepted(self, name):
-        transactions = set()
-        pool = Pool()
-        CollectTransaction = pool.get('payment.collect.transaction')
-        transactions_accepted = CollectTransaction.search([
-            ('collect', '=', self.id), ('collect_result', '=', 'A')])
-        for transaction in transactions_accepted:
-            transactions.add(transaction.id)
-        return list(transactions)
-
-    def get_transactions_rejected(self, name):
-        transactions = set()
-        pool = Pool()
-        CollectTransaction = pool.get('payment.collect.transaction')
-        transactions_rejected = CollectTransaction.search(
-            [('collect', '=', self.id), ('collect_result', '=', 'R')])
-        for transaction in transactions_rejected:
-            transactions.add(transaction.id)
-        return list(transactions)
 
     @classmethod
     def pay_invoice(cls, transaction):
