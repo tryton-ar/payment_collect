@@ -37,8 +37,16 @@ class CollectTransaction(ModelSQL, ModelView):
                              'get_invoice_amount')
     pay_date = fields.Date('Pay Date', readonly=True)
     pay_amount = fields.Numeric('Pay Amount', digits=(16, 2), readonly=True)
-    journal = fields.Many2One('account.journal', 'Journal', required=True,
-            domain=[('type', '=', 'cash')], readonly=True)
+    payment_method = fields.Many2One('account.invoice.payment.method',
+        'Payment Method', required=True, readonly=True)
+
+    @classmethod
+    def __register__(cls, module_name):
+        super(CollectTransaction, cls).__register__(module_name)
+
+        table = cls.__table_handler__(cls, module_name)
+        # Migration from 5.0: remove journal column
+        table.drop_column('journal')
 
     def get_party(self, name):
         return self.invoice.party.id

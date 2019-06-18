@@ -2,8 +2,8 @@
 <!-- The COPYRIGHT file at the top level of this repository contains the full
 copyright notices and license terms. -->
 <form>
-    <label name="journal"/>
-    <field name="journal"/>
+    <label name="payment_method"/>
+    <field name="payment_method"/>
     <label name="when_collect_payment"/>
     <field name="when_collect_payment"/>
     <label name="collect_use_cron"/>

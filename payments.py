@@ -20,7 +20,6 @@ class PaymentMixIn(object):
     monto_total = Decimal('0')
     cantidad_registros = 0
     filename = paymode_type = res = period = type = None
-    #journal = 'CASH'
 
     def attach_collect(self):
         pool = Pool()
@@ -66,7 +65,7 @@ class PaymentMixIn(object):
 
     @classmethod
     def message_invoice(cls, invoices, collect_result, message, pay_amount,
-            pay_date=None, journal=None):
+            pay_date=None, payment_method=None):
         CollectTransaction = Pool().get('payment.collect.transaction')
         Configuration = Pool().get('account.configuration')
         config = Configuration(1)
@@ -75,9 +74,9 @@ class PaymentMixIn(object):
         transaction.invoice = invoice
         transaction.pay_date = pay_date
         transaction.pay_amount = pay_amount
-        if journal is None:
-            journal = config.default_payment_collect_journal
-        transaction.journal = journal
+        if payment_method is None:
+            payment_method = config.payment_method
+        transaction.payment_method = payment_method
         transaction.party = invoice.party
         transaction.collect_result = collect_result
         transaction.collect_message = message
@@ -85,7 +84,7 @@ class PaymentMixIn(object):
         return transaction
 
     @classmethod
-    def pay_invoice(cls, invoice, amount_to_pay, pay_date=None, journal=None):
+    def pay_invoice(cls, invoice, amount_to_pay, pay_date=None, payment_method=None):
         logger.info("PAY INVOICE: invoice_id: %s" % repr(invoice.number))
         # Pagar la invoice
         pool = Pool()
@@ -113,14 +112,14 @@ class PaymentMixIn(object):
             second_currency = invoice.currency
 
         line = None
-        pay_journal = None
-        if config.default_payment_collect_journal and journal is None:
-            pay_journal = config.default_payment_collect_journal
+        pay_payment_method = None
+        if config.payment_method and payment_method is None:
+            pay_payment_method = config.payment_method
         else:
-            pay_journal = journal
+            pay_payment_method = payment_method
         if not invoice.company.currency.is_zero(amount):
             line = invoice.pay_invoice(amount,
-                                       pay_journal, pay_date,
+                                       pay_payment_method, pay_date,
                                        invoice.number, amount_second_currency,
                                        second_currency)
         if remainder != Decimal('0.0'):
