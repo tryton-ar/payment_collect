@@ -49,7 +49,7 @@ class Collect(Workflow, ModelSQL, ModelView):
         })
     pay_invoices_cron = fields.Many2One('payment.collect.pay_invoices_cron',
         'Pay Invoices Cron')
-    create_invoices = fields.Boolean('Create invoices', readonly=True,
+    create_invoices_button = fields.Boolean('Create invoices', readonly=True,
         help='Check this box if you create invoices when process return.')
 
     @classmethod
@@ -65,8 +65,8 @@ class Collect(Workflow, ModelSQL, ModelView):
         cls._buttons.update({
                 'create_invoices': {
                     'invisible': Or(Eval('type') == 'send',
-                        Eval('create_invoices', False)),
-                    'readonly': Eval('cantidad_registros', 0) == 0,
+                        ~Eval('create_invoices_button', True)),
+                    #'readonly': Eval('cantidad_registros', 0) == 0,
                     },
                 'post_invoices': {
                     'invisible': Or(Eval('type') == 'send',

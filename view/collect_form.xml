@@ -12,6 +12,8 @@ copyright notices and license terms. -->
     <field name="cantidad_registros"/>
     <label name="monto_total"/>
     <field name="monto_total"/>
+    <label name="create_invoices_button"/>
+    <field name="create_invoices_button"/>
     <notebook>
         <page string="Collect" id="collect">
             <field name="attachments" colspan="4"/>
@@ -25,6 +27,8 @@ copyright notices and license terms. -->
             </group>
             <group col="2" colspan="2" id="amount_buttons" yfill="1">
                 <group col="2" colspan="2" id="buttons">
+                    <button name="create_invoices" string="Create invoices"
+                        icon="tryton-forward"/>
                     <button name="post_invoices" string="Confirm"
                         icon="tryton-forward"/>
                     <button name="pay_invoices" string="Pay"
