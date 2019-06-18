@@ -4,7 +4,6 @@
 # the full copyright notices and license terms.
 from decimal import Decimal
 import datetime
-import io
 from trytond.pool import Pool
 from trytond.transaction import Transaction
 import logging
@@ -24,11 +23,17 @@ class PaymentMixIn(object):
     def attach_collect(self):
         pool = Pool()
         Attachment = pool.get('ir.attachment')
-        collect = self.create_collect()
+        if self.collect:
+            collect = self.collect
+        else:
+            collect = self.create_collect()
         attach = Attachment()
         attach.name = '%s' % self.filename
         attach.resource = collect
-        attach.data = ''.join(self.res).encode('utf8')
+        if self.res:
+            attach.data = ''.join(self.res).encode('utf8')
+        else:
+            attach.data = self.return_file
         attach.save()
         return collect
 
@@ -158,7 +163,7 @@ class PaymentMixIn(object):
 
     def return_collect(self, start, tabla_codigos={}):
         self.type = 'return'
-        self.return_file = io.StringIO(start.return_file)
+        self.return_file = start.return_file
         self.period = start.period
         self.create_collect()
         self.invoices_id = {
