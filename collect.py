@@ -124,8 +124,8 @@ class Collect(Workflow, ModelSQL, ModelView):
     @classmethod
     def pay_invoice(cls, transaction):
         '''
-        Adds a payment of amount to an invoice using the journal, date and
-        description.
+        Adds a payment of amount to an invoice using the
+        payment_method, date and description.
         '''
         pool = Pool()
         Currency = pool.get('currency.currency')
@@ -134,7 +134,7 @@ class Collect(Workflow, ModelSQL, ModelView):
 
         invoice = transaction.invoice
         amount_to_pay = transaction.pay_amount
-        journal = transaction.journal
+        payment_method = transaction.payment_method
         pay_date = transaction.pay_date
 
         with Transaction().set_context(date=pay_date):
@@ -153,14 +153,14 @@ class Collect(Workflow, ModelSQL, ModelView):
             second_currency = invoice.currency
 
         line = None
-        pay_journal = None
-        if config.default_payment_collect_journal and journal is None:
-            pay_journal = config.default_payment_collect_journal
+        pay_payment_method = None
+        if config.default_payment_collect_payment_method and payment_method is None:
+            pay_payment_method = config.default_payment_collect_payment_method
         else:
-            pay_journal = journal
+            pay_payment_method = payment_method
         if not invoice.company.currency.is_zero(amount):
             line = invoice.pay_invoice(amount,
-                                       pay_journal, pay_date,
+                                       pay_payment_method, pay_date,
                                        invoice.number, amount_second_currency,
                                        second_currency)
         if remainder != Decimal('0.0'):

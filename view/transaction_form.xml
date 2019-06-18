@@ -10,8 +10,8 @@ copyright notices and license terms. -->
     <field name="pay_date" />
     <label name="pay_amount" />
     <field name="pay_amount" />
-    <label name="journal" />
-    <field name="journal" />
+    <label name="payment_method" />
+    <field name="payment_method" />
     <notebook colspan="4">
         <page string="Mensaje" id='mensaje'>
             <field name="collect_message" />

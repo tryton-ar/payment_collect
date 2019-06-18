@@ -18,11 +18,8 @@ class Configuration(
         ModelSingleton, ModelSQL, ModelView, CompanyMultiValueMixin):
     'PaymentCollect Configuration'
     __name__ = 'payment_collect.configuration'
-    journal = fields.MultiValue(fields.Many2One(
-            'account.journal', "Journal", required=True,
-            domain=[
-                ('type', '=', 'cash'),
-                ]))
+    payment_method = fields.MultiValue(fields.Many2One(
+            'account.invoice.payment.method', "Payment Method", required=True))
     when_collect_payment = fields.MultiValue(
         fields.Selection(STATES, 'When collect payment'))
     collect_use_cron = fields.MultiValue(
@@ -35,7 +32,7 @@ class Configuration(
         pool = Pool()
         if field == 'when_collect_payment':
             return pool.get('payment_collect.configuration.account')
-        elif field == 'journal':
+        elif field == 'payment_method':
             return pool.get('payment_collect.configuration.account')
         elif field == 'collect_use_cron':
             return pool.get('payment_collect.configuration.account')
@@ -63,11 +60,8 @@ class ConfigurationPaymentCollectAccount(ModelSQL, CompanyValueMixin):
     "PaymentCollect Configuration Accounting"
     __name__ = 'payment_collect.configuration.account'
 
-    journal = fields.Many2One(
-        'account.journal', "Journal",
-        domain=[
-            ('type', '=', 'cash'),
-            ])
+    payment_method = fields.Many2One('account.invoice.payment.method',
+        "Payment Method")
     when_collect_payment = fields.Char('when_collect_payment')
     collect_use_cron = fields.Boolean('collect_use_cron')
     create_invoices = fields.Boolean('Create invoice when process return')
