@@ -69,8 +69,11 @@ class Collect(Workflow, ModelSQL, ModelView):
         cls._buttons.update({
                 'create_invoices': {
                     'invisible': Or(Eval('type') == 'send',
+                        Eval('state') != 'processing',
                         ~Eval('create_invoices_button', True)),
-                    #'readonly': Eval('cantidad_registros', 0) == 0,
+                    'readonly': Or(Eval('transactions_accepted', []),
+                        Eval('transactions_rejected', []),
+                        ),
                     },
                 'post_invoices': {
                     'invisible': Or(Eval('type') == 'send',
