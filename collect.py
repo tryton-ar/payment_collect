@@ -116,22 +116,27 @@ class Collect(Workflow, ModelSQL, ModelView):
         '''
         pool = Pool()
         Currency = pool.get('currency.currency')
-        Configuration = pool.get('account.configuration')
+        Configuration = pool.get('payment_collect.configuration')
         MoveLine = pool.get('account.move.line')
 
         invoice = transaction.invoice
         amount_to_pay = transaction.pay_amount
         payment_method = transaction.payment_method
         pay_date = transaction.pay_date
+        config = Configuration(1)
 
         with Transaction().set_context(date=pay_date):
             amount = Currency.compute(invoice.currency,
                 amount_to_pay, invoice.company.currency)
 
+        with Transaction().set_context(date=pay_date):
+            amount = Currency.compute(invoice.currency,
+                amount_to_pay, invoice.company.currency)
+            amount_invoice = Currency.compute(
+                invoice.currency, amount_to_pay, invoice.currency)
+
         reconcile_lines, remainder = \
             invoice.get_reconcile_lines_for_amount(amount)
-
-        config = Configuration(1)
 
         amount_second_currency = None
         second_currency = None
@@ -139,17 +144,28 @@ class Collect(Workflow, ModelSQL, ModelView):
             amount_second_currency = amount_to_pay
             second_currency = invoice.currency
 
-        line = None
+        if amount_invoice > invoice.amount_to_pay:
+            lang = Lang.get()
+            raise PayInvoiceError(
+                gettext('account_invoice'
+                    '.msg_invoice_pay_amount_greater_amount_to_pay',
+                    invoice=invoice.rec_name,
+                    amount_to_pay=lang.currency(
+                        invoice.amount_to_pay, invoice.currency)))
+
         pay_payment_method = None
-        if config.default_payment_collect_payment_method and payment_method is None:
-            pay_payment_method = config.default_payment_collect_payment_method
+        if config.payment_method and payment_method is None:
+            pay_payment_method = config.payment_method
         else:
             pay_payment_method = payment_method
+
+        line = None
         if not invoice.company.currency.is_zero(amount):
             line = invoice.pay_invoice(amount,
-                                       pay_payment_method, pay_date,
-                                       invoice.number, amount_second_currency,
-                                       second_currency)
+                pay_payment_method, pay_date,
+                invoice.number, amount_second_currency,
+                second_currency)
+
         if remainder != Decimal('0.0'):
             return
         else:
@@ -185,7 +201,7 @@ class Collect(Workflow, ModelSQL, ModelView):
         pay invoices.
         '''
         pool = Pool()
-        Configuration = pool.get('account.configuration')
+        Configuration = pool.get('payment_collect.configuration')
         config = Configuration(1)
         if config.collect_use_cron:
             PayInvoicesCron = pool.get('payment.collect.pay_invoices_cron')
