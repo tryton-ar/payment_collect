@@ -123,89 +123,23 @@ class Collect(Workflow, ModelSQL, ModelView):
         return name
 
     @classmethod
-    def pay_invoice(cls, transaction):
-        '''
-        Adds a payment of amount to an invoice using the
-        payment_method, date and description.
-        '''
-        pool = Pool()
-        Currency = pool.get('currency.currency')
-        Configuration = pool.get('payment_collect.configuration')
-        MoveLine = pool.get('account.move.line')
-
-        invoice = transaction.invoice
-        amount_to_pay = transaction.pay_amount
-        payment_method = transaction.payment_method
-        pay_date = transaction.pay_date
-        config = Configuration(1)
-
-        with Transaction().set_context(date=pay_date):
-            amount = Currency.compute(invoice.currency,
-                amount_to_pay, invoice.company.currency)
-
-        with Transaction().set_context(date=pay_date):
-            amount = Currency.compute(invoice.currency,
-                amount_to_pay, invoice.company.currency)
-            amount_invoice = Currency.compute(
-                invoice.currency, amount_to_pay, invoice.currency)
-
-        reconcile_lines, remainder = \
-            invoice.get_reconcile_lines_for_amount(amount)
-
-        amount_second_currency = None
-        second_currency = None
-        if invoice.currency != invoice.company.currency:
-            amount_second_currency = amount_to_pay
-            second_currency = invoice.currency
-
-        if amount_invoice > invoice.amount_to_pay:
-            lang = Lang.get()
-            raise PayInvoiceError(
-                gettext('account_invoice'
-                    '.msg_invoice_pay_amount_greater_amount_to_pay',
-                    invoice=invoice.rec_name,
-                    amount_to_pay=lang.currency(
-                        invoice.amount_to_pay, invoice.currency)))
-
-        pay_payment_method = None
-        if config.payment_method and payment_method is None:
-            pay_payment_method = config.payment_method
-        else:
-            pay_payment_method = payment_method
-
-        line = None
-        if not invoice.company.currency.is_zero(amount):
-            line = invoice.pay_invoice(amount,
-                pay_payment_method, pay_date,
-                invoice.number, amount_second_currency,
-                second_currency)
-
-        if remainder != Decimal('0.0'):
-            return
-        else:
-            if line:
-                reconcile_lines += [line]
-            if reconcile_lines:
-                MoveLine.reconcile(reconcile_lines)
-
-    @classmethod
     @ModelView.button
     @Workflow.transition('confirmed')
     def post_invoices(cls, collects):
         '''
         post invoices.
         '''
-        pool = Pool()
-        Invoice = pool.get('account.invoice')
+        Invoice = Pool().get('account.invoice')
         invoices = []
         for collect in collects:
-            transactions_to_post = [i for i in collect.transactions_accepted
-                 if i.invoice.state == 'validated']
-            for transaction in transactions_to_post:
+            to_post = (t for t in collect.transactions_accepted
+                if t.invoice.state == 'validated')
+            for transaction in to_post:
                 transaction.invoice.invoice_date = None
                 invoices.append(transaction.invoice)
 
-        Invoice.post(invoices)
+        if invoices:
+            Invoice.__queue__.post(invoices)
 
     @classmethod
     @ModelView.button
@@ -214,19 +148,14 @@ class Collect(Workflow, ModelSQL, ModelView):
         '''
         pay invoices.
         '''
-        pool = Pool()
-        Configuration = pool.get('payment_collect.configuration')
-        config = Configuration(1)
-        if config.collect_use_cron:
-            PayInvoicesCron = pool.get('payment.collect.pay_invoices_cron')
-            pay_invoices_cron = PayInvoicesCron()
-            pay_invoices_cron.collects = collects
-            pay_invoices_cron.paid = False
-            pay_invoices_cron.save()
-        else:
-            for collect in collects:
-                for transaction in collect.transactions_accepted:
-                    cls.pay_invoice(transaction)
+
+        CollectTransaction = Pool().get('payment.collect.transaction')
+        for collect in collects:
+            to_pay = (t for t in collect.transactions_accepted
+                if t.invoice.state == 'posted')
+            for transaction in to_pay:
+                with Transaction().set_context(queue_name='pay_invoice'):
+                    CollectTransaction.__queue__.pay_invoice(transaction)
 
     @classmethod
     @ModelView.button
@@ -249,7 +178,7 @@ class Collect(Workflow, ModelSQL, ModelView):
         '''
         create invoices.
         '''
-        pass
+        cls.__queue__._create_invoices(collects)
 
 
 class CollectSendStart(ModelView):
