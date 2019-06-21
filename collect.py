@@ -55,6 +55,20 @@ class Collect(Workflow, ModelSQL, ModelView):
         'Pay Invoices Cron')
     create_invoices_button = fields.Boolean('Create invoices', readonly=True,
         help='Check this box if you create invoices when process return.')
+    pos = fields.Many2One('account.pos', 'Point of Sale',
+        domain=[('pos_daily_report', '=', False)],
+        states={
+            'readonly': Eval('state') != 'processing',
+        },
+        depends=['state'])
+
+    @staticmethod
+    def default_pos():
+        Configuration = Pool().get('payment_collect.configuration')
+        config = Configuration(1)
+        if config.pos:
+            return config.pos.id
+        return None
 
     @classmethod
     def __setup__(cls):
