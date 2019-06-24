@@ -26,8 +26,6 @@ class Configuration(
         fields.Boolean('Use Cron to pay invoices'))
     create_invoices = fields.MultiValue(
         fields.Boolean('Add button to create invoices at return'))
-    pos = fields.MultiValue(fields.Many2One('account.pos', "Point of Sale",
-            domain=[('pos_daily_report', '=', False)]))
 
     @classmethod
     def multivalue_model(cls, field):
@@ -39,8 +37,6 @@ class Configuration(
         elif field == 'collect_use_cron':
             return pool.get('payment_collect.configuration.account')
         elif field == 'create_invoices':
-            return pool.get('payment_collect.configuration.account')
-        elif field == 'pos':
             return pool.get('payment_collect.configuration.account')
         return super(Configuration, cls).multivalue_model(field)
 
@@ -59,11 +55,6 @@ class Configuration(
         return cls.multivalue_model(
             'create_invoices').default_create_invoices()
 
-    @classmethod
-    def default_pos(cls, **pattern):
-        return cls.multivalue_model(
-            'pos').default_pos()
-
 
 class ConfigurationPaymentCollectAccount(ModelSQL, CompanyValueMixin):
     "PaymentCollect Configuration Accounting"
@@ -74,8 +65,6 @@ class ConfigurationPaymentCollectAccount(ModelSQL, CompanyValueMixin):
     when_collect_payment = fields.Char('when_collect_payment')
     collect_use_cron = fields.Boolean('collect_use_cron')
     create_invoices = fields.Boolean('Create invoice when process return')
-    pos = fields.Many2One('account.pos', "Point of Sale", required=True,
-        domain=[('pos_daily_report', '=', False)])
 
     @classmethod
     def default_when_collect_payment(cls):
@@ -88,7 +77,3 @@ class ConfigurationPaymentCollectAccount(ModelSQL, CompanyValueMixin):
     @staticmethod
     def default_create_invoices():
         return False
-
-    @staticmethod
-    def default_pos():
-        return None
