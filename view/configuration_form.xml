@@ -10,7 +10,5 @@ copyright notices and license terms. -->
     <field name="collect_use_cron"/>
     <label name="create_invoices"/>
     <field name="create_invoices"/>
-    <label name="pos"/>
-    <field name="pos" widget="selection"/>
     <newline/>
 </form>

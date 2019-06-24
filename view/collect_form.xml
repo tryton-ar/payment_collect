@@ -14,8 +14,6 @@ copyright notices and license terms. -->
     <field name="monto_total"/>
     <label name="create_invoices_button"/>
     <field name="create_invoices_button"/>
-    <label name="pos"/>
-    <field name="pos" widget="selection"/>
     <notebook>
         <page string="Collect" id="collect">
             <field name="attachments" colspan="4"/>
