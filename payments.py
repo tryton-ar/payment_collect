@@ -25,6 +25,8 @@ class PaymentMixIn(object):
         Attachment = pool.get('ir.attachment')
         if not self.collect:
             collect = self.create_collect()
+        else:
+            collect = self.collect
         attach = Attachment()
         attach.name = '%s' % self.filename
         attach.resource = collect
