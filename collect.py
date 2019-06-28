@@ -100,6 +100,10 @@ class Collect(Workflow, ModelSQL, ModelView):
             ]
 
     @staticmethod
+    def default_type():
+        return Transaction().context.get('type', None)
+
+    @staticmethod
     def default_state():
         return 'processing'
 
