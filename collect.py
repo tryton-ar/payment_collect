@@ -129,7 +129,7 @@ class Collect(Workflow, ModelSQL, ModelView):
                 invoices.append(transaction.invoice)
 
         if invoices:
-            Invoice.__queue__.post(invoices)
+            Invoice.post(invoices)
 
     @classmethod
     @ModelView.button
