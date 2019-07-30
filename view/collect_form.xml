@@ -33,8 +33,6 @@ copyright notices and license terms. -->
                         icon="tryton-forward"/>
                     <button name="pay_invoices" string="Pay"
                         icon="tryton-forward"/>
-                    <button name="publish_invoices" string="Publish"
-                        icon="tryton-forward"/>
                 </group>
             </group>
         </page>
