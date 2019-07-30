@@ -84,10 +84,6 @@ class Collect(Workflow, ModelSQL, ModelView):
                     'invisible': Or(Eval('type') == 'send',
                         Eval('state') != 'confirmed'),
                     },
-                'publish_invoices': {
-                    'invisible': Or(Eval('type') == 'send',
-                        Eval('state') != 'paid'),
-                    },
                 })
 
     @classmethod
@@ -146,20 +142,6 @@ class Collect(Workflow, ModelSQL, ModelView):
             for transaction in to_pay:
                 with Transaction().set_context(queue_name='pay_invoice'):
                     CollectTransaction.__queue__.pay_invoice(transaction)
-
-    @classmethod
-    @ModelView.button
-    @Workflow.transition('done')
-    def publish_invoices(cls, collects):
-        '''
-        publish invoices.
-        '''
-        InvoiceReport = Pool().get('account.invoice', type='report')
-        invoices = []
-        for collect in collects:
-            for transaction in collect.transactions_accepted:
-                invoices.append(transaction.invoice)
-        InvoiceReport.execute([i.id for i in invoices], {})
 
     @classmethod
     @ModelView.button
