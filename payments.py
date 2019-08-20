@@ -18,7 +18,14 @@ class PaymentMixIn(object):
     csv_format = False
     monto_total = Decimal('0')
     cantidad_registros = 0
-    filename = paymode_type = res = period = type = None
+    filename = None
+    paymode_type = None
+    res = None
+    period = None
+    type = None
+    collect = None
+    return_file = None
+
 
     def attach_collect(self):
         pool = Pool()
