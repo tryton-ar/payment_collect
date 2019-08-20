@@ -14,7 +14,6 @@ def register():
         party.Party,
         party.PartyPayMode,
         paymode.PayMode,
-        collect.PayInvoicesCron,
         collect.Collect,
         collect.CollectSendStart,
         collect.CollectReturnStart,
