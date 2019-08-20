@@ -6,8 +6,6 @@ copyright notices and license terms. -->
     <field name="payment_method"/>
     <label name="when_collect_payment"/>
     <field name="when_collect_payment"/>
-    <label name="collect_use_cron"/>
-    <field name="collect_use_cron"/>
     <label name="create_invoices"/>
     <field name="create_invoices"/>
     <newline/>
