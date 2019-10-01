@@ -4,7 +4,8 @@ copyright notices and license terms. -->
 <form>
     <label name="paymode_type"/>
     <field name="paymode_type"/>
-    <newline />
+    <label name="create_invoices"/>
+    <field name="create_invoices"/>
     <label name="period"/>
     <field name="period"/>
     <label name="return_file"/>
