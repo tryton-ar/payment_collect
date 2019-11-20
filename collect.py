@@ -1,4 +1,3 @@
-# ! -*- coding: utf8 -*-
 # This file is part of the payment_collect module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
@@ -20,6 +19,7 @@ STATES = [
     ('confirmed', 'Confirmed'),
     ('paid', 'Paid'),
     ('done', 'Done'),
+    ('cancel', 'Cancelled'),
     ]
 
 
@@ -59,8 +59,12 @@ class Collect(Workflow, ModelSQL, ModelView):
         super(Collect, cls).__setup__()
         cls._transitions |= set((
                 ('invoicing', 'processing'),
+                ('invoicing', 'cancel'),
+                ('processing', 'invoicing'),
+                ('processing', 'processing'),
                 ('processing', 'processing'),
                 ('processing', 'confirmed'),
+                ('processing', 'cancel'),
                 ('confirmed', 'paid'),
                 ('paid', 'done'),
                 ))
@@ -149,6 +153,12 @@ class Collect(Workflow, ModelSQL, ModelView):
         create invoices.
         '''
         cls.__queue__._create_invoices(collects)
+
+    @classmethod
+    @ModelView.button
+    @Workflow.transition('cancel')
+    def cancel(cls, collects):
+        pass
 
 
 class CollectSendStart(ModelView):
