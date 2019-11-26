@@ -160,6 +160,10 @@ class Collect(Workflow, ModelSQL, ModelView):
     def cancel(cls, collects):
         pass
 
+    @classmethod
+    def _create_invoices(cls, collects):
+        pass
+
 
 class CollectSendStart(ModelView):
     'Collect Send Start'
