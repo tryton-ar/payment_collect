@@ -136,11 +136,21 @@ class Collect(Workflow, ModelSQL, ModelView):
         '''
         pay invoices.
         '''
+        pool = Pool()
+        CollectTransaction = pool.get('payment.collect.transaction')
+        MoveLine = pool.get('account.move.line')
+        Period = pool.get('account.period')
 
-        CollectTransaction = Pool().get('payment.collect.transaction')
         for collect in collects:
             to_pay = (t for t in collect.transactions_accepted
                 if t.invoice.state == 'posted')
+            period_and_journals = set((Period.find(t.invoice.company.id,
+                        t.pay_date), t.payment_method.journal)
+                for t in collect.transactions_accepted)
+
+            for period, journal in period_and_journals:
+                MoveLine.check_journal_period_modify(period, journal)
+
             for transaction in to_pay:
                 with Transaction().set_context(queue_name='pay_invoice'):
                     CollectTransaction.__queue__.pay_invoice(transaction)
