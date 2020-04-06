@@ -45,7 +45,7 @@ class PaymentMixIn(object):
         return collect
 
     @classmethod
-    def get_domain(cls, period):
+    def get_domain(cls, period=None):
         Config = Pool().get('payment_collect.configuration')
         config = Config(1)
         invoice_type = ['out']
@@ -53,8 +53,9 @@ class PaymentMixIn(object):
         domain = [
             ('state', 'in', [config.when_collect_payment]),
             ('type', 'in', invoice_type),
-            ('move.period', '=', period),
             ]
+        if period:
+            domain.append(('move.period', '=', period))
 
         return domain
 
@@ -147,8 +148,9 @@ class PaymentMixIn(object):
         Collect = Pool().get('payment.collect')
         collect = Collect()
         collect.monto_total = self.monto_total
+        if self.period:
+            collect.period = self.period
         collect.cantidad_registros = self.cantidad_registros
-        collect.period = self.period
         collect.paymode_type = self.__name__
         #collect.origin = self
         collect.type = self.type

@@ -227,7 +227,6 @@ class CollectReturnStart(ModelView):
     paymode_type = fields.Selection('get_origin', 'Pay Mode')
     return_file = fields.Binary('Return File')
     pay_date = fields.Date('Pay date')
-    period = fields.Many2One('account.period', 'Period', required=True)
     create_invoices = fields.Boolean('Create Invoices',
         help='Check this box if you want to import invoices.')
 
