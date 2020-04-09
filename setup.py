@@ -17,7 +17,10 @@ def read(fname):
 
 
 def get_require_version(name):
-    require = '%s >= %s.%s, < %s.%s'
+    if minor_version % 2:
+        require = '%s >= %s.%s.dev0, < %s.%s'
+    else:
+        require = '%s >= %s.%s, < %s.%s'
     require %= (name, major_version, minor_version,
         major_version, minor_version + 1)
     return require
@@ -37,6 +40,11 @@ name = 'trytonar_payment_collect'
 
 download_url = 'https://github.com/tryton-ar/payment_collect/tree/%s.%s' % (
     major_version, minor_version)
+if minor_version % 2:
+    version = '%s.%s.dev0' % (major_version, minor_version)
+    download_url = (
+        'hg+http://hg.tryton.org/modules/%s#egg=%s-%s' % (
+            name[8:], name, version))
 
 requires = []
 for dep in info.get('depends', []):
@@ -46,6 +54,8 @@ requires.append(get_require_version('trytond'))
 
 tests_require = [get_require_version('proteus')]
 dependency_links = []
+if minor_version % 2:
+    dependency_links.append('https://trydevpi.tryton.org/')
 
 setup(name=name,
     version=version,
