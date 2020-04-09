@@ -149,7 +149,7 @@ class Collect(Workflow, ModelSQL, ModelView):
                 for t in collect.transactions_accepted)
 
             for period, journal in period_and_journals:
-                MoveLine.check_journal_period_modify(period, journal)
+                MoveLine.check_journal_period_modify(Period(period), journal)
 
             for transaction in to_pay:
                 with Transaction().set_context(queue_name='pay_invoice'):
