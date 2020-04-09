@@ -4,6 +4,7 @@ copyright notices and license terms. -->
 <tree>
     <field name="invoice" />
     <field name="invoice_state" />
+    <field name="invoice_date" />
     <field name="party" />
     <field name="phone" />
     <field name="email" />

@@ -4,10 +4,9 @@ copyright notices and license terms. -->
 <form>
     <label name="paymode_type"/>
     <field name="paymode_type"/>
-    <label name="period"/>
-    <field name="period"/>
     <label name="expiration_date"/>
     <field name="expiration_date"/>
     <label name="csv_format"/>
     <field name="csv_format"/>
+    <field name="periods" colspan="4"/>
 </form>

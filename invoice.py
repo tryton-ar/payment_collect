@@ -37,6 +37,8 @@ class CollectTransaction(ModelSQL, ModelView):
         'get_party_contact')
     invoice_state = fields.Function(fields.Char('Invoice state',
             readonly=True), 'get_invoice_state')
+    invoice_date = fields.Function(fields.Date('Invoice date'),
+            'get_invoice_date')
     amount = fields.Function(fields.Numeric('Amount', digits=(16, 2),
             readonly=True), 'get_invoice_amount')
     pay_date = fields.Date('Pay Date', readonly=True)
@@ -65,6 +67,11 @@ class CollectTransaction(ModelSQL, ModelView):
     def get_invoice_state(self, name):
         if hasattr(self.invoice, 'state'):
             return self.invoice.state
+        return None
+
+    def get_invoice_date(self, name):
+        if hasattr(self.invoice, 'invoice_date'):
+            return self.invoice.invoice_date
         return None
 
     def get_invoice_amount(self, name):

@@ -4,8 +4,6 @@ copyright notices and license terms. -->
 <form>
     <label name="paymode_type"/>
     <field name="paymode_type"/>
-    <label name="period"/>
-    <field name="period"/>
     <label name="type"/>
     <field name="type"/>
     <label name="cantidad_registros"/>
@@ -17,6 +15,7 @@ copyright notices and license terms. -->
     <notebook>
         <page string="Collect" id="collect">
             <field name="attachments" colspan="4"/>
+            <field name="periods" colspan="4"/>
             <group col="2" colspan="2" id="states" yfill="1">
                 <!--
                 <label name="invoice_state"/>

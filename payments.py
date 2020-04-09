@@ -21,7 +21,7 @@ class PaymentMixIn(object):
     filename = None
     paymode_type = None
     res = None
-    period = None
+    periods = None
     type = None
     collect = None
     return_file = None
@@ -45,7 +45,7 @@ class PaymentMixIn(object):
         return collect
 
     @classmethod
-    def get_domain(cls, period=None):
+    def get_domain(cls, periods=None):
         Config = Pool().get('payment_collect.configuration')
         config = Config(1)
         invoice_type = ['out']
@@ -54,8 +54,8 @@ class PaymentMixIn(object):
             ('state', 'in', [config.when_collect_payment]),
             ('type', 'in', invoice_type),
             ]
-        if period:
-            domain.append(('move.period', '=', period))
+        if periods:
+            domain.append(('move.period', 'in', periods))
 
         return domain
 
@@ -148,8 +148,8 @@ class PaymentMixIn(object):
         Collect = Pool().get('payment.collect')
         collect = Collect()
         collect.monto_total = self.monto_total
-        if self.period:
-            collect.period = self.period
+        if self.periods:
+            collect.periods = self.periods
         collect.cantidad_registros = self.cantidad_registros
         collect.paymode_type = self.__name__
         #collect.origin = self
@@ -158,22 +158,11 @@ class PaymentMixIn(object):
         self.collect = collect
         return collect
 
-    def _add_attach_to_collect(self, collect, return_file):
-        Attachment = Pool().get('ir.attachment')
-        return_file.seek(0)
-        attach = Attachment()
-        filename = collect.paymode_type + '-' + self.type + '-' + \
-            datetime.date.today().strftime("%Y-%m-%d")
-        attach = Attachment()
-        attach.name = filename + '.txt'
-        attach.resource = collect
-        attach.data = return_file.read()
-        attach.save()
-
     def return_collect(self, start, tabla_codigos={}):
         self.type = 'return'
         self.return_file = start.return_file
-        self.period = start.period
+        if hasattr(start, 'periods'):
+            self.periods = start.periods
         self.create_collect()
         self.invoices_id = {
             'accepted_invoices': [],

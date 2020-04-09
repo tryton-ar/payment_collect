@@ -62,6 +62,10 @@ msgctxt "field:payment.collect,period:"
 msgid "Period"
 msgstr "Período"
 
+msgctxt "field:payment.collect,periods:"
+msgid "Periods"
+msgstr "Períodos"
+
 msgctxt "field:payment.collect,rec_name:"
 msgid "Name"
 msgstr "Nombre"

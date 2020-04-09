@@ -46,6 +46,8 @@ class Collect(Workflow, ModelSQL, ModelView):
         ('return', 'Return'),
         ], 'Type', readonly=True)
     period = fields.Many2One('account.period', 'Period', readonly=True)
+    periods = fields.Many2Many('payment.collect-account.period',
+        'collect', 'period', 'Periods', readonly=True)
     paymode_type = fields.Char('Pay Mode', readonly=True)
     state = fields.Selection(STATES, 'State', readonly=True,
         required=True, states={
@@ -175,13 +177,23 @@ class Collect(Workflow, ModelSQL, ModelView):
         pass
 
 
+class CollectPeriod(ModelSQL):
+    'Collect - Period'
+    __name__ = 'payment.collect-account.period'
+    _table = 'collect_period_rel'
+    collect = fields.Many2One('payment.collect', 'Collect', ondelete='CASCADE',
+            required=True, select=True)
+    period = fields.Many2One('account.period', 'Period',
+        ondelete='CASCADE', required=True, select=True)
+
+
 class CollectSendStart(ModelView):
     'Collect Send Start'
     __name__ = 'payment.collect.send.start'
 
     csv_format = fields.Boolean('CSV format?',
         help='Check this box if you want export to csv format.')
-    period = fields.Many2One('account.period', 'Period', required=True)
+    periods = fields.Many2Many('account.period', None, None, 'Periods')
     expiration_date = fields.Date('Fecha de vencimiento')
     paymode_type = fields.Selection('get_origin', 'Pay Mode')
 
@@ -235,10 +247,19 @@ class CollectReturnStart(ModelView):
     __name__ = 'payment.collect.return.start'
 
     paymode_type = fields.Selection('get_origin', 'Pay Mode')
+    periods = fields.Many2Many('account.period', None, None, 'Periods')
     return_file = fields.Binary('Return File')
     pay_date = fields.Date('Pay date')
     create_invoices = fields.Boolean('Create Invoices',
         help='Check this box if you want to import invoices.')
+
+    @classmethod
+    def __setup__(cls):
+        super(CollectReturnStart, cls).__setup__()
+        cls.periods.states.update({
+            'invisible': Eval('paymode_type').in_(cls._paymode_types())
+        })
+        cls.periods.depends += ['paymode_type']
 
     @staticmethod
     def default_create_invoices():
@@ -252,6 +273,11 @@ class CollectReturnStart(ModelView):
     @classmethod
     def _get_origin(cls):
         'Return list of Model names for origin Reference'
+        return ['']
+
+    @classmethod
+    def _paymode_types(cls):
+        'Return list of Model names for paymode_type'
         return ['']
 
     @classmethod

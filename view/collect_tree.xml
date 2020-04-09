@@ -3,7 +3,7 @@
 copyright notices and license terms. -->
 <tree>
     <field name="paymode_type"/>
-    <field name="period"/>
+    <!-- <field name="period"/> -->
     <field name="type"/>
     <field name="state"/>
 </tree>

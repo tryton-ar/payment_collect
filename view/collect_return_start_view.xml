@@ -8,4 +8,5 @@ copyright notices and license terms. -->
     <field name="create_invoices"/>
     <label name="return_file"/>
     <field name="return_file"/>
+    <field name="periods" colspan="4"/>
 </form>
