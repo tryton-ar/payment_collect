@@ -1,4 +1,3 @@
-# ! -*- coding: utf8 -*-
 # This file is part of the payment_collect module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
@@ -153,56 +152,20 @@ class Invoice(metaclass=PoolMeta):
         'invoice', "Collect Transaction", readonly=True)
     paymode = fields.Many2One(
         'payment.paymode',
-        'Pay mode', domain=[('party', '=', Eval('party', None))],
+        'Pay mode', domain=[('party', '=', Eval('party', -1))],
         states={
             'readonly': Not(Bool(Eval('state').in_(['draft', 'validated']))),
         }, depends=['state', 'party'])
 
-    def __get_paymode(self):
-        '''
-        Return a pay mode.
-        '''
+    @fields.depends('party', 'type')
+    def on_change_with_paymode(self):
+        paymode = None
         if self.party:
-            if (self.type == 'out' and self.party.customer_paymode):
-                self.paymode = self.party.customer_paymode
-            if (self.type == 'in' and self.party.supplier_paymode):
-                self.paymode = self.party.supplier_paymode
-
-    def on_change_party(self):
-        super(Invoice, self).on_change_party()
-        self.paymode = None
-        self.__get_paymode()
-
-    @classmethod
-    def compute_default_paymode(cls, values):
-        pool = Pool()
-        Party = pool.get('party.party')
-        Company = pool.get('company.company')
-
-        payment_type = values.get('payment_type')
-        party = values.get('party')
-        _type = values.get('type')
-        company = values.get('company', Transaction().context.get('company'))
-
-        changes = {}
-        if not payment_type and party and _type and company:
-            invoice = cls()
-            invoice.party = Party(party)
-            invoice.type = _type
-            invoice.company = Company(company)
-            invoice.payment_type = None
-            invoice.__get_paymode()
-            if hasattr(invoice, 'paymode'):
-                changes['paymode'] = invoice.paymode
-
-        return changes
-
-    @classmethod
-    def create(cls, vlist):
-        vlist = [x.copy() for x in vlist]
-        for values in vlist:
-            values.update(cls.compute_default_paymode(values))
-        return super(Invoice, cls).create(vlist)
+            if self.type == 'out':
+                paymode = self.party.customer_paymode
+            elif self.type == 'in':
+                paymode = self.party.supplier_paymode
+        return paymode.id if paymode else None
 
     @classmethod
     def copy(cls, invoices, default=None):
