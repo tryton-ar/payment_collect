@@ -41,5 +41,8 @@ copyright notices and license terms. -->
         <page string="Rejected Invoices" id="rejected_invoices">
             <field name="transactions_rejected" colspan="4"/>
         </page>
+        <page string="Advance credit to Invoices" id="advance_credit_invoices">
+            <field name="apply_credit_to_invoices" colspan="4"/>
+        </page>
     </notebook>
 </form>

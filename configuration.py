@@ -24,6 +24,12 @@ class Configuration(
         fields.Selection(STATES, 'When collect payment'))
     create_invoices = fields.MultiValue(
         fields.Boolean('Add button to create invoices at return'))
+    advance_account = fields.MultiValue(fields.Many2One(
+            'account.account', "Advance Account",
+            domain=[
+                ('party_required', '=', True),
+                ('company', '=', Eval('context', {}).get('company', -1)),
+                ]))
 
     @classmethod
     def multivalue_model(cls, field):
@@ -33,6 +39,8 @@ class Configuration(
         elif field == 'payment_method':
             return pool.get('payment_collect.configuration.account')
         elif field == 'create_invoices':
+            return pool.get('payment_collect.configuration.account')
+        elif field == 'advance_account':
             return pool.get('payment_collect.configuration.account')
         return super(Configuration, cls).multivalue_model(field)
 
@@ -55,6 +63,13 @@ class ConfigurationPaymentCollectAccount(ModelSQL, CompanyValueMixin):
         "Payment Method")
     when_collect_payment = fields.Char('when_collect_payment')
     create_invoices = fields.Boolean('Create invoice when process return')
+    advance_account = fields.Many2One(
+        'account.account', "Advance Account",
+        domain=[
+            ('party_required', '=', True),
+            ('company', '=', Eval('company', -1)),
+            ],
+        depends=['company'])
 
     @classmethod
     def default_when_collect_payment(cls):

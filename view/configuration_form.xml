@@ -6,6 +6,8 @@ copyright notices and license terms. -->
     <field name="payment_method"/>
     <label name="when_collect_payment"/>
     <field name="when_collect_payment"/>
+    <label name="advance_account"/>
+    <field name="advance_account"/>
     <label name="create_invoices"/>
     <field name="create_invoices"/>
     <newline/>

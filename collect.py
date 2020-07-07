@@ -2,16 +2,18 @@
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
 from decimal import Decimal
+import logging
+
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.transaction import Transaction
 from trytond.model import Workflow, fields, ModelSQL, ModelView
 from trytond.pool import Pool
 from trytond.pyson import Eval, Or
-import logging
+
 logger = logging.getLogger(__name__)
 
 __all__ = ['Collect', 'CollectSend', 'CollectSendStart', 'CollectReturn',
-           'CollectReturnStart', 'PayInvoicesCron']
+           'CollectReturnStart']
 
 STATES = [
     ('invoicing', 'Invoicing'),
@@ -31,15 +33,17 @@ class Collect(Workflow, ModelSQL, ModelView):
     cantidad_registros = fields.Integer('Cantidad de registros', readonly=True)
     attachments = fields.One2Many('ir.attachment', 'resource', 'Attachments')
     transactions_accepted = fields.One2Many('payment.collect.transaction',
-        'collect','Accepted transactions', filter=[
+        'collect', 'Accepted transactions', filter=[
             ('collect_result', '=', 'A'),
             ('invoice', '!=', None),
             ], readonly=True)
     transactions_rejected = fields.One2Many('payment.collect.transaction',
-        'collect','Rejected transactions', filter=[
+        'collect', 'Rejected transactions', filter=[
             ('collect_result', '=', 'R'),
             ('invoice', '!=', None),
             ], readonly=True)
+    apply_credit_to_invoices = fields.Many2Many('payment.collect-account.move.line',
+        'collect', 'move_line', 'Apply Credit', readonly=True)
     type = fields.Selection([
         (None, ''),
         ('send', 'Send'),
@@ -112,6 +116,65 @@ class Collect(Workflow, ModelSQL, ModelView):
             name = self.paymode_type
         return name
 
+    def get_paid_invoices(self):
+        return []
+
+    @classmethod
+    def apply_credit(cls, transaction):
+        pool = Pool()
+        Company = pool.get('company.company')
+        Configuration = Pool().get('payment_collect.configuration')
+        Date = pool.get('ir.date')
+        Invoice = pool.get('account.invoice')
+        Move = pool.get('account.move')
+        MoveLine = pool.get('account.move.line')
+        PaymentMethod = pool.get('account.invoice.payment.method')
+        Period = pool.get('account.period')
+        config = Configuration(1)
+
+        amount = transaction['amount']
+        invoice = Invoice(transaction['invoice'])
+        date = transaction['date']
+        payment_method = PaymentMethod(transaction['payment_method'])
+        move_lines = []
+
+        if not date:
+            date = Date.today()
+
+        move, = Move.create([{
+            'period': Period.find(invoice.company.id, date=date),
+            'journal': payment_method.journal.id,
+            'date': date,
+            'origin': str(invoice),
+            'description': 'advance Factura: %s' % invoice.number,
+        }])
+
+        move_lines.append({
+            'debit': abs(amount),
+            'credit': Decimal('0'),
+            'account': payment_method.debit_account.id,
+            'move': move.id,
+            'journal': payment_method.journal.id,
+            'period': Period.find(invoice.company.id, date=date),
+            'party': (payment_method.debit_account.party_required
+                and invoice.party.id or None),
+        })
+
+        move_lines.append({
+            'debit': Decimal('0'),
+            'credit': abs(amount),
+            'account': config.advance_account.id,
+            'move': move.id,
+            'journal': payment_method.journal.id,
+            'period': Period.find(invoice.company.id, date=date),
+            'party': (invoice.account.party_required
+                and invoice.party.id or None),
+            'description': 'advance %s' % invoice.number
+        })
+        created_lines = MoveLine.create(move_lines)
+        Move.post([move])
+        return created_lines[1]
+
     @classmethod
     @ModelView.button
     @Workflow.transition('confirmed')
@@ -142,8 +205,10 @@ class Collect(Workflow, ModelSQL, ModelView):
         CollectTransaction = pool.get('payment.collect.transaction')
         MoveLine = pool.get('account.move.line')
         Period = pool.get('account.period')
+        apply_credits = []
 
         for collect in collects:
+            to_credit = collect.get_paid_invoices()
             to_pay = (t for t in collect.transactions_accepted
                 if t.invoice.state == 'posted')
             period_and_journals = set((Period.find(t.invoice.company.id,
@@ -156,6 +221,14 @@ class Collect(Workflow, ModelSQL, ModelView):
             for transaction in to_pay:
                 with Transaction().set_context(queue_name='pay_invoice'):
                     CollectTransaction.__queue__.pay_invoice(transaction)
+
+            for transaction in to_credit:
+                move_line = cls.apply_credit(transaction)
+                apply_credits.append(move_line.id)
+
+            cls.write([collect], {
+                'apply_credit_to_invoices': [('add', apply_credits)],
+                })
 
     @classmethod
     @ModelView.button
@@ -185,6 +258,16 @@ class CollectPeriod(ModelSQL):
             required=True, select=True)
     period = fields.Many2One('account.period', 'Period',
         ondelete='CASCADE', required=True, select=True)
+
+
+class CollectMoveLine(ModelSQL):
+    'Collect - Apply Credit Invoice'
+    __name__ = 'payment.collect-account.move.line'
+    _table = 'collect_credit_account_move_line_rel'
+    collect = fields.Many2One('payment.collect', 'Collect',
+            ondelete='CASCADE', required=True, select=True)
+    move_line = fields.Many2One('account.move.line', 'Line',
+            ondelete='CASCADE', required=True, select=True)
 
 
 class CollectSendStart(ModelView):

@@ -3,9 +3,10 @@
 # the full copyright notices and license terms.
 from decimal import Decimal
 import datetime
+import logging
+
 from trytond.pool import Pool
 from trytond.transaction import Transaction
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -79,14 +80,14 @@ class PaymentMixIn(object):
     def message_invoice(cls, invoices, collect_result, message, pay_amount,
             pay_date=None, payment_method=None):
         CollectTransaction = Pool().get('payment.collect.transaction')
-        Configuration = Pool().get('account.configuration')
+        Configuration = Pool().get('payment_collect.configuration')
         config = Configuration(1)
         invoice, = invoices
         transaction = CollectTransaction()
         transaction.invoice = invoice
         transaction.pay_date = pay_date
         transaction.pay_amount = pay_amount
-        if payment_method is None:
+        if not payment_method:
             payment_method = config.payment_method
         transaction.payment_method = payment_method
         transaction.party = invoice.party
@@ -97,8 +98,7 @@ class PaymentMixIn(object):
 
     @classmethod
     def pay_invoice(cls, invoice, amount_to_pay, pay_date=None, payment_method=None):
-        logger.info("PAY INVOICE: invoice_id: %s" % repr(invoice.number))
-        # Pagar la invoice
+        logger.info("pay_invoice: %s", invoice.number)
         pool = Pool()
         Currency = pool.get('currency.currency')
         Configuration = pool.get('account.configuration')
@@ -141,7 +141,6 @@ class PaymentMixIn(object):
                 reconcile_lines += [line]
             if reconcile_lines:
                 MoveLine.reconcile(reconcile_lines)
-        # Fin pagar invoice
 
     def create_collect(self):
         Collect = Pool().get('payment.collect')
