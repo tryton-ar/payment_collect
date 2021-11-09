@@ -11,8 +11,6 @@ from trytond.modules.account_invoice.invoice import STATES
 from trytond.modules.company.model import (
     CompanyMultiValueMixin, CompanyValueMixin)
 
-__all__ = ['Configuration', 'ConfigurationPaymentCollectAccount']
-
 
 class Configuration(
         ModelSingleton, ModelSQL, ModelView, CompanyMultiValueMixin):

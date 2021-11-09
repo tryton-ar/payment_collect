@@ -8,8 +8,6 @@ from . import invoice
 from . import party
 from . import configuration
 
-__all__ = ['register']
-
 
 def register():
     Pool.register(

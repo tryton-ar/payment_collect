@@ -5,7 +5,6 @@ from trytond.pool import PoolMeta, Pool
 from trytond.pyson import Eval
 from trytond.modules.company.model import CompanyValueMixin
 
-__all__ = ['PartyPayMode', 'Party']
 customer_paymode = fields.Many2One('payment.paymode', 'Customer pay mode',
     domain=[('party', '=', Eval('id'))], context={
         'party': Eval('id', None),
@@ -14,7 +13,6 @@ supplier_paymode = fields.Many2One('payment.paymode', 'Supplier pay mode',
     domain=[('party', '=', Eval('id'))], context={
         'party': Eval('id', None),
         }, depends=['id'])
-
 
 
 class Party(metaclass=PoolMeta):

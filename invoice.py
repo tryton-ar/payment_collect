@@ -9,9 +9,7 @@ from trytond.pool import PoolMeta, Pool
 from trytond.pyson import Eval, Not, Bool
 from trytond.transaction import Transaction
 
-__all__ = ['Invoice', 'CollectTransaction']
 logger = logging.getLogger(__name__)
-
 
 class CollectTransaction(ModelSQL, ModelView):
     'Collect Transaction'

@@ -12,9 +12,6 @@ from trytond.pyson import Eval, Or
 
 logger = logging.getLogger(__name__)
 
-__all__ = ['Collect', 'CollectSend', 'CollectSendStart', 'CollectReturn',
-           'CollectReturnStart']
-
 STATES = [
     ('invoicing', 'Invoicing'),
     ('processing', 'Processing'),
