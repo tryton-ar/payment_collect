@@ -22,6 +22,8 @@ class Collect(Workflow, ModelSQL, ModelView):
         ('send', 'Send'),
         ('return', 'Return'),
         ], 'Type', readonly=True)
+    date = fields.Function(fields.DateTime('Date'),
+       'get_date', searcher='search_date')
     paymode_type = fields.Char('Pay Mode', readonly=True)
     monto_total = fields.Numeric('Monto total', digits=(16, 2),
         readonly=True)
@@ -115,6 +117,23 @@ class Collect(Workflow, ModelSQL, ModelView):
 
     def get_paid_invoices(self):
         return []
+
+    def get_date(self, name):
+        return self.create_date.replace(microsecond=0)
+
+    @classmethod
+    def search_date(cls, name, clause):
+        cursor = Transaction().connection.cursor()
+        operator_ = clause[1:2][0]
+        cursor.execute('SELECT id '
+                'FROM "' + cls._table + '" '
+                'WHERE create_date' + operator_ + ' %s',
+                clause[2:3])
+        return [('id', 'in', [x[0] for x in cursor.fetchall()])]
+
+    @classmethod
+    def order_date(cls, tables):
+        return cls.create_date.convert_order('create_date', tables, cls)
 
     @classmethod
     def apply_credit(cls, transaction):
@@ -274,7 +293,7 @@ class CollectSendStart(ModelView):
     csv_format = fields.Boolean('CSV format?',
         help='Check this box if you want export to csv format.')
     periods = fields.Many2Many('account.period', None, None, 'Periods')
-    expiration_date = fields.Date('Fecha de vencimiento')
+    expiration_date = fields.Date('Fecha de vencimiento', required=True)
     paymode_type = fields.Selection('get_origin', 'Pay Mode')
 
     @staticmethod
