@@ -9,6 +9,10 @@ import re
 from configparser import ConfigParser
 from setuptools import setup
 
+MODULE = 'payment_collect'
+PREFIX = 'trytonar'
+MODULE2PREFIX = {}
+
 
 def read(fname):
     return io.open(
@@ -17,6 +21,10 @@ def read(fname):
 
 
 def get_require_version(name):
+    #if name.startswith('trytonar_'):
+        #return ''
+    if name in LINKS:
+        return '%s@%s' % (name, LINKS[name])
     if minor_version % 2:
         require = '%s >= %s.%s.dev0, < %s.%s'
     else:
@@ -27,7 +35,7 @@ def get_require_version(name):
 
 
 config = ConfigParser()
-config.read_file(open('tryton.cfg'))
+config.read_file(open(os.path.join(os.path.dirname(__file__), 'tryton.cfg')))
 info = dict(config.items('tryton'))
 for key in ('depends', 'extras_depend', 'xml'):
     if key in info:
@@ -36,72 +44,76 @@ version = info.get('version', '0.0.1')
 major_version, minor_version, _ = version.split('.', 2)
 major_version = int(major_version)
 minor_version = int(minor_version)
-name = 'trytonar_payment_collect'
-
-download_url = 'https://github.com/tryton-ar/payment_collect/tree/%s.%s' % (
-    major_version, minor_version)
+series = '%s.%s' % (major_version, minor_version)
 if minor_version % 2:
-    version = '%s.%s.dev0' % (major_version, minor_version)
-    download_url = (
-        'hg+http://hg.tryton.org/modules/%s#egg=%s-%s' % (
-            name[8:], name, version))
+    branch = 'master'
+else:
+    branch = series
+
+download_url = 'https://github.com/gcoop-libre/payment_collect/tree/%s' % branch
+
+LINKS = {}
 
 requires = []
 for dep in info.get('depends', []):
     if not re.match(r'(ir|res)(\W|$)', dep):
-        requires.append(get_require_version('trytond_%s' % dep))
+        module_name = '%s_%s' % (MODULE2PREFIX.get(dep, 'trytond'), dep)
+        requires.append(get_require_version(module_name))
+
 requires.append(get_require_version('trytond'))
 
 tests_require = [get_require_version('proteus')]
-dependency_links = []
+dependency_links = list(LINKS.values())
 if minor_version % 2:
     dependency_links.append('https://trydevpi.tryton.org/')
 
-setup(name=name,
+setup(name='%s_%s' % (PREFIX, MODULE),
     version=version,
     description='Tryton module to collect payments from different sources',
     long_description=read('README'),
-    author='tryton-ar',
-    url='https://github.com/tryton-ar/payment_collect',
+    author='gcoop-libre',
+    url='https://github.com/gcoop-libre/payment_collect',
     download_url=download_url,
-    package_dir={'trytond.modules.payment_collect': '.'},
+    package_dir={'trytond.modules.%s' % MODULE: '.'},
     packages=[
-        'trytond.modules.payment_collect',
-        'trytond.modules.payment_collect.tests',
+        'trytond.modules.%s' % MODULE,
+        'trytond.modules.%s.tests' % MODULE,
         ],
     package_data={
-        'trytond.modules.payment_collect': (info.get('xml', [])
-            + ['tryton.cfg', 'view/*.xml', 'locale/*.po']),
+        'trytond.modules.%s' % MODULE: (info.get('xml', []) + [
+            'tryton.cfg', 'view/*.xml', 'locale/*.po', 'tests/*.rst']),
         },
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Plugins',
         'Framework :: Tryton',
         'Intended Audience :: Developers',
         'Intended Audience :: Financial and Insurance Industry',
         'Intended Audience :: Legal Industry',
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'License :: OSI Approved :: '
+        'GNU General Public License v3 or later (GPLv3+)',
         'Natural Language :: English',
         'Natural Language :: Spanish',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Office/Business',
         'Topic :: Office/Business :: Financial :: Accounting',
         ],
     license='GPL-3',
-    python_requires='>=3.4',
+    python_requires='>=3.6',
     install_requires=requires,
     dependency_links=dependency_links,
     zip_safe=False,
     entry_points="""
     [trytond.modules]
-    payment_collect = trytond.modules.payment_collect
-    """,
+    %s = trytond.modules.%s
+    """ % (MODULE, MODULE),
     test_suite='tests',
     test_loader='trytond.test_loader:Loader',
     tests_require=tests_require,
