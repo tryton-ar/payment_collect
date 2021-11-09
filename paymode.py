@@ -6,6 +6,8 @@ from stdnum.ar import cbu
 from trytond.model import fields, ModelSQL, ModelView
 from trytond.pool import Pool
 from trytond.pyson import Eval
+from trytond.exceptions import UserError
+from trytond.i18n import gettext
 
 
 class PayMode(ModelSQL, ModelView):
@@ -31,13 +33,6 @@ class PayMode(ModelSQL, ModelView):
     credit_number = fields.Char('Number')
     credit_expiration_date = fields.Date('Expiration date')
     credit_bank = fields.Many2One('bank', 'Credit card bank')
-
-    @classmethod
-    def __setup__(cls):
-        super(PayMode, cls).__setup__()
-        cls._error_messages.update({
-                'invalid_cbu': 'Invalid CBU "%s".',
-                })
 
     @classmethod
     def _get_origin(cls):
@@ -76,4 +71,5 @@ class PayMode(ModelSQL, ModelView):
         super().pre_validate()
         if (self.type == 'payment.paymode.bccl' and self.bank_account and not
                 cbu.is_valid(self.bank_account.rec_name)):
-            self.raise_user_error('invalid_cbu', self.bank_account.rec_name)
+            raise UserError(gettext('payment_collect.msg_invalid_cbu',
+                    self.bank_account.rec_name))
