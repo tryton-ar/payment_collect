@@ -1,15 +1,13 @@
 <?xml version="1.0"?>
-<!-- The COPYRIGHT file at the top level of this repository contains the full
-copyright notices and license terms. -->
 <data>
     <xpath
-    expr="/form/notebook/page[@id=&quot;info&quot;]/field[@name=&quot;accounting_date&quot;]"
-    position="after">
+        expr="/form/notebook/page[@id='info']/field[@name='accounting_date']"
+        position="after">
         <label name="paymode"/>
         <field name="paymode"/>
     </xpath>
     <xpath expr="/form/notebook/page[@id='payment']" position="after">
-        <page string="Collect Transactions" id="collect_transactions">
+        <page id="collect_transactions" string="Collect">
             <field name="collect_transactions" colspan="4"/>
         </page>
     </xpath>

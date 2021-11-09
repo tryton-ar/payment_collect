@@ -1,14 +1,12 @@
 <?xml version="1.0"?>
-<!-- The COPYRIGHT file at the top level of this repository contains the full
-copyright notices and license terms. -->
 <tree>
-    <field name="invoice" />
-    <field name="invoice_state" />
-    <field name="invoice_date" />
-    <field name="party" />
-    <field name="phone" />
-    <field name="email" />
-    <field name="amount" />
-    <field name="collect_result" />
-    <field name="collect_message" />
+    <field name="invoice"/>
+    <field name="invoice_state"/>
+    <field name="invoice_date"/>
+    <field name="party"/>
+    <field name="phone"/>
+    <field name="email"/>
+    <field name="amount"/>
+    <field name="collect_result"/>
+    <field name="collect_message"/>
 </tree>

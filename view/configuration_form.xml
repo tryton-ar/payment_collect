@@ -1,6 +1,4 @@
 <?xml version="1.0"?>
-<!-- The COPYRIGHT file at the top level of this repository contains the full
-copyright notices and license terms. -->
 <form>
     <label name="payment_method"/>
     <field name="payment_method"/>
@@ -8,7 +6,9 @@ copyright notices and license terms. -->
     <field name="when_collect_payment"/>
     <label name="advance_account"/>
     <field name="advance_account"/>
-    <label name="create_invoices"/>
-    <field name="create_invoices"/>
+    <group id="create_invoices" colspan="2" col="2">
+        <label name="create_invoices"/>
+        <field name="create_invoices"/>
+    </group>
     <newline/>
 </form>
