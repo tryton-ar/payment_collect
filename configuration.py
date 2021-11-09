@@ -35,15 +35,10 @@ class Configuration(
     @classmethod
     def multivalue_model(cls, field):
         pool = Pool()
-        if field == 'when_collect_payment':
+        if field in ['when_collect_payment', 'payment_method',
+                'create_invoices', 'advance_account']:
             return pool.get('payment_collect.configuration.account')
-        elif field == 'payment_method':
-            return pool.get('payment_collect.configuration.account')
-        elif field == 'create_invoices':
-            return pool.get('payment_collect.configuration.account')
-        elif field == 'advance_account':
-            return pool.get('payment_collect.configuration.account')
-        return super(Configuration, cls).multivalue_model(field)
+        return super().multivalue_model(field)
 
     @classmethod
     def default_when_collect_payment(cls, **pattern):

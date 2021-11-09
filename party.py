@@ -29,7 +29,7 @@ class Party(metaclass=PoolMeta):
         pool = Pool()
         if field in ['customer_paymode', 'supplier_paymode']:
             return pool.get('party.party.paymode')
-        return super(Party, cls).multivalue_model(field)
+        return super().multivalue_model(field)
 
 
 class PartyPayMode(CompanyValueMixin, ModelSQL):

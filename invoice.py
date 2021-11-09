@@ -47,8 +47,7 @@ class CollectTransaction(ModelSQL, ModelView):
 
     @classmethod
     def __register__(cls, module_name):
-        super(CollectTransaction, cls).__register__(module_name)
-
+        super().__register__(module_name)
         table = cls.__table_handler__(cls, module_name)
         # Migration from 5.0: remove journal column
         table.drop_column('journal')
@@ -175,4 +174,4 @@ class Invoice(metaclass=PoolMeta):
             default = default.copy()
         default['collect_transactions'] = None
         default['paymode'] = None
-        return super(Invoice, cls).copy(invoices, default=default)
+        return super().copy(invoices, default=default)

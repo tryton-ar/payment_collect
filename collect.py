@@ -62,7 +62,7 @@ class Collect(Workflow, ModelSQL, ModelView):
 
     @classmethod
     def __setup__(cls):
-        super(Collect, cls).__setup__()
+        super().__setup__()
         cls._transitions |= set((
                 ('invoicing', 'processing'),
                 ('invoicing', 'cancel'),
@@ -96,11 +96,11 @@ class Collect(Workflow, ModelSQL, ModelView):
 
     @classmethod
     def view_attributes(cls):
-        return [
+        return super().view_attributes() + [
             ('/form//page[@id="accepted_invoices"]|/form//page[@id="rejected_invoices"]',
                 'states', {
                     'invisible': Eval('type') == 'send',
-                })
+                    })
             ]
 
     @staticmethod
@@ -338,7 +338,7 @@ class CollectReturnStart(ModelView):
 
     @classmethod
     def __setup__(cls):
-        super(CollectReturnStart, cls).__setup__()
+        super().__setup__()
         cls.periods.states.update({
             'invisible': Eval('paymode_type').in_(cls._paymode_types())
         })
