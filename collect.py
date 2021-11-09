@@ -261,7 +261,7 @@ class CollectPeriod(ModelSQL):
 
 
 class CollectMoveLine(ModelSQL):
-    'Collect - Apply Credit Invoice'
+    'Collect - Credit applied'
     __name__ = 'payment.collect-account.move.line'
     _table = 'collect_credit_account_move_line_rel'
     collect = fields.Many2One('payment.collect', 'Collect',
@@ -271,7 +271,7 @@ class CollectMoveLine(ModelSQL):
 
 
 class CollectSendStart(ModelView):
-    'Collect Send Start'
+    'Send Payment Collect'
     __name__ = 'payment.collect.send.start'
 
     csv_format = fields.Boolean('CSV format?',
@@ -300,7 +300,7 @@ class CollectSendStart(ModelView):
 
 
 class CollectSend(Wizard):
-    'Collect Send'
+    'Send Payment Collect'
     __name__ = 'payment.collect.send'
 
     start = StateView(
@@ -326,7 +326,7 @@ class CollectSend(Wizard):
 
 
 class CollectReturnStart(ModelView):
-    'Collect Return Start'
+    'Return Payment Collect'
     __name__ = 'payment.collect.return.start'
 
     paymode_type = fields.Selection('get_origin', 'Pay Mode')
@@ -374,7 +374,7 @@ class CollectReturnStart(ModelView):
 
 
 class CollectReturn(Wizard):
-    'Collect Send'
+    'Return Payment Collect'
     __name__ = 'payment.collect.return'
 
     start = StateView(

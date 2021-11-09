@@ -22,7 +22,7 @@ class Party(metaclass=PoolMeta):
     customer_paymode = fields.MultiValue(customer_paymode)
     supplier_paymode = fields.MultiValue(supplier_paymode)
     paymode_types = fields.One2Many('party.party.paymode', 'party',
-        "Paymodes Types")
+        "Party Pay Mode")
 
     @classmethod
     def multivalue_model(cls, field):
@@ -33,7 +33,7 @@ class Party(metaclass=PoolMeta):
 
 
 class PartyPayMode(CompanyValueMixin, ModelSQL):
-    "Party PayMode"
+    "Party Pay Mode"
     __name__ = 'party.party.paymode'
     party = fields.Many2One('party.party', 'Party', ondelete='CASCADE')
     customer_paymode = fields.Many2One('payment.paymode',

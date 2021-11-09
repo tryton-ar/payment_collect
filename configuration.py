@@ -16,10 +16,11 @@ __all__ = ['Configuration', 'ConfigurationPaymentCollectAccount']
 
 class Configuration(
         ModelSingleton, ModelSQL, ModelView, CompanyMultiValueMixin):
-    'PaymentCollect Configuration'
+    'Payment Collect Configuration'
     __name__ = 'payment_collect.configuration'
     payment_method = fields.MultiValue(fields.Many2One(
-            'account.invoice.payment.method', "Payment Method", required=True))
+        'account.invoice.payment.method', "Default Payment Method",
+        required=True))
     when_collect_payment = fields.MultiValue(
         fields.Selection(STATES, 'When collect payment'))
     create_invoices = fields.MultiValue(
@@ -56,11 +57,11 @@ class Configuration(
 
 
 class ConfigurationPaymentCollectAccount(ModelSQL, CompanyValueMixin):
-    "PaymentCollect Configuration Accounting"
+    "Payment Collect Accounting Configuration"
     __name__ = 'payment_collect.configuration.account'
 
     payment_method = fields.Many2One('account.invoice.payment.method',
-        "Payment Method")
+        "Default Payment Method")
     when_collect_payment = fields.Char('when_collect_payment')
     create_invoices = fields.Boolean('Create invoice when process return')
     advance_account = fields.Many2One(

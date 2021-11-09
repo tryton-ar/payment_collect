@@ -11,7 +11,7 @@ __all__ = ['PayMode']
 
 
 class PayMode(ModelSQL, ModelView):
-    'Paymode'
+    'Pay Mode'
     __name__ = 'payment.paymode'
 
     party = fields.Many2One('party.party', 'Party', ondelete='CASCADE',

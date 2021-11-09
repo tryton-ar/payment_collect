@@ -149,7 +149,7 @@ class Invoice(metaclass=PoolMeta):
     __name__ = 'account.invoice'
 
     collect_transactions = fields.One2Many('payment.collect.transaction',
-        'invoice', "Collect Transaction", readonly=True)
+        'invoice', "Collect Transactions", readonly=True)
     paymode = fields.Many2One(
         'payment.paymode',
         'Pay mode', domain=[('party', '=', Eval('party', -1))],
