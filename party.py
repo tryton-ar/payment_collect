@@ -5,20 +5,16 @@ from trytond.pool import PoolMeta, Pool
 from trytond.pyson import Eval
 from trytond.modules.company.model import CompanyValueMixin
 
-customer_paymode = fields.Many2One('payment.paymode', 'Customer pay mode',
-    domain=[('party', '=', Eval('id'))], context={
-        'party': Eval('id', None),
-        }, depends=['id'])
-supplier_paymode = fields.Many2One('payment.paymode', 'Supplier pay mode',
-    domain=[('party', '=', Eval('id'))], context={
-        'party': Eval('id', None),
-        }, depends=['id'])
-
 
 class Party(metaclass=PoolMeta):
     __name__ = 'party.party'
-    customer_paymode = fields.MultiValue(customer_paymode)
-    supplier_paymode = fields.MultiValue(supplier_paymode)
+
+    customer_paymode = fields.MultiValue(fields.Many2One('payment.paymode',
+        'Customer pay mode', domain=[('party', '=', Eval('id'))],
+        context={'party': Eval('id', None)}, depends=['id']))
+    supplier_paymode = fields.MultiValue(fields.Many2One('payment.paymode',
+        'Supplier pay mode', domain=[('party', '=', Eval('id'))],
+        context={'party': Eval('id', None)}, depends=['id']))
     paymode_types = fields.One2Many('party.party.paymode', 'party',
         "Party Pay Mode")
 
@@ -34,7 +30,5 @@ class PartyPayMode(CompanyValueMixin, ModelSQL):
     "Party Pay Mode"
     __name__ = 'party.party.paymode'
     party = fields.Many2One('party.party', 'Party', ondelete='CASCADE')
-    customer_paymode = fields.Many2One('payment.paymode',
-        'Customer pay mode')
-    supplier_paymode = fields.Many2One('payment.paymode',
-        'Supplier pay mode')
+    customer_paymode = fields.Many2One('payment.paymode', 'Customer pay mode')
+    supplier_paymode = fields.Many2One('payment.paymode', 'Supplier pay mode')

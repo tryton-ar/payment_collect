@@ -7,7 +7,6 @@ from trytond.pool import Pool
 from trytond import backend
 from trytond.tools.multivalue import migrate_property
 from trytond.pyson import Eval
-from trytond.modules.account_invoice.invoice import STATES
 from trytond.modules.company.model import (
     CompanyMultiValueMixin, CompanyValueMixin)
 
@@ -19,8 +18,11 @@ class Configuration(
     payment_method = fields.MultiValue(fields.Many2One(
         'account.invoice.payment.method', "Default Payment Method",
         required=True))
-    when_collect_payment = fields.MultiValue(
-        fields.Selection(STATES, 'When collect payment'))
+    when_collect_payment = fields.MultiValue(fields.Selection([
+        ('draft', "Draft"),
+        ('validated', "Validated"),
+        ('posted', "Posted"),
+        ], 'When collect payment', sort=False))
     create_invoices = fields.MultiValue(
         fields.Boolean('Add button to create invoices at return'))
     advance_account = fields.MultiValue(fields.Many2One(

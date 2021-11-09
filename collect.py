@@ -12,15 +12,6 @@ from trytond.pyson import Eval, Or
 
 logger = logging.getLogger(__name__)
 
-STATES = [
-    ('invoicing', 'Invoicing'),
-    ('processing', 'Processing'),
-    ('confirmed', 'Confirmed'),
-    ('paid', 'Paid'),
-    ('done', 'Done'),
-    ('cancel', 'Cancelled'),
-    ]
-
 
 class Collect(Workflow, ModelSQL, ModelView):
     'Collect'
@@ -49,11 +40,16 @@ class Collect(Workflow, ModelSQL, ModelView):
     period = fields.Many2One('account.period', 'Period', readonly=True)
     periods = fields.Many2Many('payment.collect-account.period',
         'collect', 'period', 'Periods', readonly=True)
+    state = fields.Selection([
+        ('invoicing', 'Invoicing'),
+        ('processing', 'Processing'),
+        ('confirmed', 'Confirmed'),
+        ('paid', 'Paid'),
+        ('done', 'Done'),
+        ('cancel', 'Cancelled'),
+        ], 'State', readonly=True, required=True,
+        states={'invisible': Eval('type') == 'send'})
     paymode_type = fields.Char('Pay Mode', readonly=True)
-    state = fields.Selection(STATES, 'State', readonly=True,
-        required=True, states={
-            'invisible': Eval('type') == 'send',
-        })
     create_invoices_button = fields.Boolean('Create invoices', readonly=True,
         help='Check this box if you create invoices when process return.')
 
