@@ -17,17 +17,18 @@ class PayMode(ModelSQL, ModelView):
     party = fields.Many2One('party.party', 'Party', ondelete='CASCADE',
         required=True, select=True)
     type = fields.Selection('get_origin', 'Type')
-
     # DEBIT
     cbu_number = fields.Char('CBU number')
-    bank_account = fields.Many2One('bank.account',
-        'Bank Account', context={
+    bank_account = fields.Many2One('bank.account', 'Bank Account',
+        context={
             'owners': Eval('party'),
             'numbers.type': 'cbu',
-            }, domain=[
+            },
+        domain=[
             ('owners', '=', Eval('party')),
             ('numbers.type', '=', 'cbu'),
-            ], depends=['party'])
+            ],
+        depends=['party'])
     # CREDIT
     #credit_paymode = fields.Selection('get_credit_paymode', 'Type')
     credit_number = fields.Char('Number')
@@ -44,16 +45,15 @@ class PayMode(ModelSQL, ModelView):
         Model = Pool().get('ir.model')
         models = cls._get_origin()
         models = Model.search([
-                ('model', 'in', models),
-                ])
+            ('model', 'in', models),
+            ])
         return [(None, '')] + [(m.model, m.name) for m in models]
 
     def get_rec_name(self, name):
         if self.type and self.party:
             return '[%s] %s' % (Pool().get(self.type).__doc__,
                 self.party.rec_name)
-        else:
-            return name
+        return name
 
     @classmethod
     def search_rec_name(cls, name, clause):

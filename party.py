@@ -1,5 +1,7 @@
-# The COPYRIGHT file at the top level of this repository contains the
-# full copyright notices and license terms.
+# This file is part of the payment_collect module for Tryton.
+# The COPYRIGHT file at the top level of this repository contains
+# the full copyright notices and license terms.
+
 from trytond.model import ModelSQL, fields
 from trytond.pool import PoolMeta, Pool
 from trytond.pyson import Eval
@@ -29,6 +31,7 @@ class Party(metaclass=PoolMeta):
 class PartyPayMode(CompanyValueMixin, ModelSQL):
     "Party Pay Mode"
     __name__ = 'party.party.paymode'
+
     party = fields.Many2One('party.party', 'Party', ondelete='CASCADE')
     customer_paymode = fields.Many2One('payment.paymode', 'Customer pay mode')
     supplier_paymode = fields.Many2One('payment.paymode', 'Supplier pay mode')

@@ -2,7 +2,6 @@
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
 from decimal import Decimal
-import datetime
 import logging
 
 from trytond.pool import Pool
@@ -26,10 +25,8 @@ class PaymentMixIn(object):
     collect = None
     return_file = None
 
-
     def attach_collect(self):
-        pool = Pool()
-        Attachment = pool.get('ir.attachment')
+        Attachment = Pool().get('ir.attachment')
         if not self.collect:
             collect = self.create_collect()
         else:
@@ -79,8 +76,9 @@ class PaymentMixIn(object):
     @classmethod
     def message_invoice(cls, invoices, collect_result, message, pay_amount,
             pay_date=None, payment_method=None):
-        CollectTransaction = Pool().get('payment.collect.transaction')
-        Configuration = Pool().get('payment_collect.configuration')
+        pool = Pool()
+        CollectTransaction = pool.get('payment.collect.transaction')
+        Configuration = pool.get('payment_collect.configuration')
         config = Configuration(1)
         invoice, = invoices
         transaction = CollectTransaction()
@@ -97,13 +95,14 @@ class PaymentMixIn(object):
         return transaction
 
     @classmethod
-    def pay_invoice(cls, invoice, amount_to_pay, pay_date=None, payment_method=None):
+    def pay_invoice(cls, invoice, amount_to_pay, pay_date=None,
+            payment_method=None):
         logger.info("pay_invoice: %s", invoice.number)
         pool = Pool()
         Currency = pool.get('currency.currency')
         Configuration = pool.get('account.configuration')
         MoveLine = pool.get('account.move.line')
-        Date = Pool().get('ir.date')
+        Date = pool.get('ir.date')
 
         if pay_date is None:
             pay_date = Date.today()
@@ -130,10 +129,8 @@ class PaymentMixIn(object):
         else:
             pay_payment_method = payment_method
         if not invoice.company.currency.is_zero(amount):
-            line = invoice.pay_invoice(amount,
-                                       pay_payment_method, pay_date,
-                                       invoice.number, amount_second_currency,
-                                       second_currency)
+            line = invoice.pay_invoice(amount, pay_payment_method, pay_date,
+                invoice.number, amount_second_currency, second_currency)
         if remainder != Decimal('0.0'):
             return
         else:
@@ -143,15 +140,18 @@ class PaymentMixIn(object):
                 MoveLine.reconcile(reconcile_lines)
 
     def create_collect(self):
-        Collect = Pool().get('payment.collect')
+        pool = Pool()
+        Collect = pool.get('payment.collect')
+        Model = pool.get('ir.model')
+
+        model, = Model.search([('model', '=', self.__name__)])
         collect = Collect()
+        collect.type = self.type
+        collect.paymode_type = model.name
+        collect.cantidad_registros = self.cantidad_registros
         collect.monto_total = self.monto_total
         if self.periods:
             collect.periods = self.periods
-        collect.cantidad_registros = self.cantidad_registros
-        collect.paymode_type = self.__name__
-        #collect.origin = self
-        collect.type = self.type
         collect.save()
         self.collect = collect
         return collect
@@ -173,8 +173,13 @@ class PaymentMixIn(object):
     def get_format_date(self):
         pool = Pool()
         Lang = pool.get('ir.lang')
-        es_419 = Lang(code='es_419')
-        return lambda value: es_419.strftime(value, '%d/%m/%Y')
+        format_ = '%d/%m/%Y'
+        es_419 = Lang(
+            code='es_419',
+            date=format_,
+            )
+        return (lambda value, format=None:
+            value and es_419.strftime(value, format or format_) or '')
 
     def get_format_number(self):
         pool = Pool()

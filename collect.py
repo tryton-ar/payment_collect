@@ -4,11 +4,11 @@
 from decimal import Decimal
 import logging
 
-from trytond.wizard import Wizard, StateView, StateAction, Button
-from trytond.transaction import Transaction
 from trytond.model import Workflow, fields, ModelSQL, ModelView
+from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.pool import Pool
 from trytond.pyson import Eval, Or
+from trytond.transaction import Transaction
 
 logger = logging.getLogger(__name__)
 
@@ -17,9 +17,18 @@ class Collect(Workflow, ModelSQL, ModelView):
     'Collect'
     __name__ = 'payment.collect'
 
-    monto_total = fields.Numeric('Monto total', digits=(16, 2), readonly=True)
-    cantidad_registros = fields.Integer('Cantidad de registros', readonly=True)
-    attachments = fields.One2Many('ir.attachment', 'resource', 'Attachments')
+    type = fields.Selection([
+        (None, ''),
+        ('send', 'Send'),
+        ('return', 'Return'),
+        ], 'Type', readonly=True)
+    paymode_type = fields.Char('Pay Mode', readonly=True)
+    monto_total = fields.Numeric('Monto total', digits=(16, 2),
+        readonly=True)
+    cantidad_registros = fields.Integer('Cantidad de registros',
+        readonly=True)
+    attachments = fields.One2Many('ir.attachment', 'resource', 'Attachments',
+        readonly=True)
     transactions_accepted = fields.One2Many('payment.collect.transaction',
         'collect', 'Accepted transactions', filter=[
             ('collect_result', '=', 'A'),
@@ -30,13 +39,9 @@ class Collect(Workflow, ModelSQL, ModelView):
             ('collect_result', '=', 'R'),
             ('invoice', '!=', None),
             ], readonly=True)
-    apply_credit_to_invoices = fields.Many2Many('payment.collect-account.move.line',
-        'collect', 'move_line', 'Apply Credit', readonly=True)
-    type = fields.Selection([
-        (None, ''),
-        ('send', 'Send'),
-        ('return', 'Return'),
-        ], 'Type', readonly=True)
+    apply_credit_to_invoices = fields.Many2Many(
+        'payment.collect-account.move.line', 'collect', 'move_line',
+        'Apply Credit', readonly=True)
     period = fields.Many2One('account.period', 'Period', readonly=True)
     periods = fields.Many2Many('payment.collect-account.period',
         'collect', 'period', 'Periods', readonly=True)
@@ -49,43 +54,42 @@ class Collect(Workflow, ModelSQL, ModelView):
         ('cancel', 'Cancelled'),
         ], 'State', readonly=True, required=True,
         states={'invisible': Eval('type') == 'send'})
-    paymode_type = fields.Char('Pay Mode', readonly=True)
     create_invoices_button = fields.Boolean('Create invoices', readonly=True,
         help='Check this box if you create invoices when process return.')
 
     @classmethod
     def __setup__(cls):
         super().__setup__()
+        cls._order.insert(0, ('create_date', 'DESC'))
         cls._transitions |= set((
-                ('invoicing', 'processing'),
-                ('invoicing', 'cancel'),
-                ('processing', 'invoicing'),
-                ('processing', 'processing'),
-                ('processing', 'processing'),
-                ('processing', 'confirmed'),
-                ('processing', 'cancel'),
-                ('confirmed', 'paid'),
-                ('paid', 'done'),
-                ))
+            ('invoicing', 'processing'),
+            ('invoicing', 'cancel'),
+            ('processing', 'invoicing'),
+            ('processing', 'processing'),
+            ('processing', 'confirmed'),
+            ('processing', 'cancel'),
+            ('confirmed', 'paid'),
+            ('paid', 'done'),
+            ))
         cls._buttons.update({
-                'create_invoices': {
-                    'invisible': Or(Eval('type') == 'send',
-                        Eval('state') != 'processing',
-                        ~Eval('create_invoices_button', True)),
-                    'readonly': Or(Eval('transactions_accepted', []),
-                        Eval('transactions_rejected', []),
-                        ),
-                    },
-                'post_invoices': {
-                    'invisible': Or(Eval('type') == 'send',
-                        Eval('state') != 'processing'),
-                    'readonly': ~Eval('transactions_accepted', []),
-                    },
-                'pay_invoices': {
-                    'invisible': Or(Eval('type') == 'send',
-                        Eval('state') != 'confirmed'),
-                    },
-                })
+            'create_invoices': {
+                'invisible': Or(Eval('type') == 'send',
+                    Eval('state') != 'processing',
+                    ~Eval('create_invoices_button', True)),
+                'readonly': Or(Eval('transactions_accepted', []),
+                    Eval('transactions_rejected', []),
+                    ),
+                },
+            'post_invoices': {
+                'invisible': Or(Eval('type') == 'send',
+                    Eval('state') != 'processing'),
+                'readonly': ~Eval('transactions_accepted', []),
+                },
+            'pay_invoices': {
+                'invisible': Or(Eval('type') == 'send',
+                    Eval('state') != 'confirmed'),
+                },
+            })
 
     @classmethod
     def view_attributes(cls):
@@ -115,8 +119,7 @@ class Collect(Workflow, ModelSQL, ModelView):
     @classmethod
     def apply_credit(cls, transaction):
         pool = Pool()
-        Company = pool.get('company.company')
-        Configuration = Pool().get('payment_collect.configuration')
+        Configuration = pool.get('payment_collect.configuration')
         Date = pool.get('ir.date')
         Invoice = pool.get('account.invoice')
         Move = pool.get('account.move')
@@ -140,7 +143,7 @@ class Collect(Workflow, ModelSQL, ModelView):
             'date': date,
             'origin': str(invoice),
             'description': 'advance Factura: %s' % invoice.number,
-        }])
+            }])
 
         move_lines.append({
             'debit': abs(amount),
@@ -151,7 +154,7 @@ class Collect(Workflow, ModelSQL, ModelView):
             'period': Period.find(invoice.company.id, date=date),
             'party': (payment_method.debit_account.party_required
                 and invoice.party.id or None),
-        })
+            })
 
         move_lines.append({
             'debit': Decimal('0'),
@@ -163,7 +166,7 @@ class Collect(Workflow, ModelSQL, ModelView):
             'party': (invoice.account.party_required
                 and invoice.party.id or None),
             'description': 'advance %s' % invoice.number
-        })
+            })
         created_lines = MoveLine.create(move_lines)
         Move.post([move])
         return created_lines[1]
@@ -183,7 +186,6 @@ class Collect(Workflow, ModelSQL, ModelView):
             for transaction in to_post:
                 transaction.invoice.invoice_date = None
                 invoices.append(transaction.invoice)
-
         if invoices:
             Invoice.post(invoices)
 
@@ -247,8 +249,9 @@ class CollectPeriod(ModelSQL):
     'Collect - Period'
     __name__ = 'payment.collect-account.period'
     _table = 'collect_period_rel'
-    collect = fields.Many2One('payment.collect', 'Collect', ondelete='CASCADE',
-            required=True, select=True)
+
+    collect = fields.Many2One('payment.collect', 'Collect',
+        ondelete='CASCADE', required=True, select=True)
     period = fields.Many2One('account.period', 'Period',
         ondelete='CASCADE', required=True, select=True)
 
@@ -257,10 +260,11 @@ class CollectMoveLine(ModelSQL):
     'Collect - Credit applied'
     __name__ = 'payment.collect-account.move.line'
     _table = 'collect_credit_account_move_line_rel'
+
     collect = fields.Many2One('payment.collect', 'Collect',
-            ondelete='CASCADE', required=True, select=True)
+        ondelete='CASCADE', required=True, select=True)
     move_line = fields.Many2One('account.move.line', 'Line',
-            ondelete='CASCADE', required=True, select=True)
+        ondelete='CASCADE', required=True, select=True)
 
 
 class CollectSendStart(ModelView):
@@ -334,7 +338,7 @@ class CollectReturnStart(ModelView):
         super().__setup__()
         cls.periods.states.update({
             'invisible': Eval('paymode_type').in_(cls._paymode_types())
-        })
+            })
         cls.periods.depends += ['paymode_type']
 
     @staticmethod
@@ -347,13 +351,13 @@ class CollectReturnStart(ModelView):
         return Date.today()
 
     @classmethod
-    def _get_origin(cls):
-        'Return list of Model names for origin Reference'
+    def _paymode_types(cls):
+        'Return list of Model names for paymode_type'
         return ['']
 
     @classmethod
-    def _paymode_types(cls):
-        'Return list of Model names for paymode_type'
+    def _get_origin(cls):
+        'Return list of Model names for origin Reference'
         return ['']
 
     @classmethod

@@ -1,11 +1,9 @@
 # This file is part of the payment_collect module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
+
 from trytond.model import ModelView, ModelSQL, ModelSingleton, fields
-from trytond.model import MultiValueMixin, ValueMixin
 from trytond.pool import Pool
-from trytond import backend
-from trytond.tools.multivalue import migrate_property
 from trytond.pyson import Eval
 from trytond.modules.company.model import (
     CompanyMultiValueMixin, CompanyValueMixin)
@@ -15,6 +13,7 @@ class Configuration(
         ModelSingleton, ModelSQL, ModelView, CompanyMultiValueMixin):
     'Payment Collect Configuration'
     __name__ = 'payment_collect.configuration'
+
     payment_method = fields.MultiValue(fields.Many2One(
         'account.invoice.payment.method', "Default Payment Method",
         required=True))
@@ -23,14 +22,14 @@ class Configuration(
         ('validated', "Validated"),
         ('posted', "Posted"),
         ], 'When collect payment', sort=False))
-    create_invoices = fields.MultiValue(
-        fields.Boolean('Add button to create invoices at return'))
+    create_invoices = fields.MultiValue(fields.Boolean(
+        'Allow to create invoice when processing return'))
     advance_account = fields.MultiValue(fields.Many2One(
-            'account.account', "Advance Account",
-            domain=[
-                ('party_required', '=', True),
-                ('company', '=', Eval('context', {}).get('company', -1)),
-                ]))
+        'account.account', "Advance Account",
+        domain=[
+            ('party_required', '=', True),
+            ('company', '=', Eval('context', {}).get('company', -1)),
+            ]))
 
     @classmethod
     def multivalue_model(cls, field):
@@ -57,8 +56,9 @@ class ConfigurationPaymentCollectAccount(ModelSQL, CompanyValueMixin):
 
     payment_method = fields.Many2One('account.invoice.payment.method',
         "Default Payment Method")
-    when_collect_payment = fields.Char('when_collect_payment')
-    create_invoices = fields.Boolean('Create invoice when process return')
+    when_collect_payment = fields.Char('When collect payment')
+    create_invoices = fields.Boolean(
+        'Allow to create invoice when processing return')
     advance_account = fields.Many2One(
         'account.account', "Advance Account",
         domain=[

@@ -1,7 +1,6 @@
 # This file is part of the payment_collect module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
-import logging
 from decimal import Decimal
 
 from trytond.model import fields, ModelSQL, ModelView
@@ -9,17 +8,16 @@ from trytond.pool import PoolMeta, Pool
 from trytond.pyson import Eval, Not, Bool
 from trytond.transaction import Transaction
 
-logger = logging.getLogger(__name__)
 
 class CollectTransaction(ModelSQL, ModelView):
     'Collect Transaction'
     __name__ = 'payment.collect.transaction'
 
     collect_result = fields.Selection([
-            ('', 'n/a'),
-            ('A', 'Aceptado'),
-            ('R', 'Rechazado'),
-            ], 'Resultado', readonly=True,
+        ('', 'n/a'),
+        ('A', 'Aceptado'),
+        ('R', 'Rechazado'),
+        ], 'Resultado', readonly=True,
         help="Resultado procesamiento de la Cobranza")
     collect_message = fields.Text('Mensaje', readonly=True,
         help="Mensaje de error u observación")
@@ -27,17 +25,17 @@ class CollectTransaction(ModelSQL, ModelView):
         ondelete='CASCADE')
     collect = fields.Many2One('payment.collect', 'Payment Collect')
     party = fields.Function(fields.Many2One('party.party', 'Party',
-            readonly=True), 'get_party')
+        readonly=True), 'get_party')
     phone = fields.Function(fields.Char('Phone', readonly=True),
         'get_party_contact')
     email = fields.Function(fields.Char('E-mail', readonly=True),
         'get_party_contact')
     invoice_state = fields.Function(fields.Char('Invoice state',
-            readonly=True), 'get_invoice_state')
+        readonly=True), 'get_invoice_state')
     invoice_date = fields.Function(fields.Date('Invoice date'),
-            'get_invoice_date')
+        'get_invoice_date')
     amount = fields.Function(fields.Numeric('Amount', digits=(16, 2),
-            readonly=True), 'get_invoice_amount')
+        readonly=True), 'get_invoice_amount')
     pay_date = fields.Date('Pay Date', readonly=True)
     pay_amount = fields.Numeric('Pay Amount', digits=(16, 2), readonly=True)
     payment_method = fields.Many2One('account.invoice.payment.method',
@@ -99,8 +97,8 @@ class CollectTransaction(ModelSQL, ModelView):
         with Transaction().set_context(date=pay_date):
             amount = Currency.compute(invoice.currency,
                 amount_to_pay, invoice.company.currency)
-            amount_invoice = Currency.compute(
-                invoice.currency, amount_to_pay, invoice.currency)
+            #amount_invoice = Currency.compute(
+                #invoice.currency, amount_to_pay, invoice.currency)
 
         reconcile_lines, remainder = \
             invoice.get_reconcile_lines_for_amount(amount)
@@ -126,20 +124,18 @@ class CollectTransaction(ModelSQL, ModelView):
         else:
             pay_payment_method = payment_method
 
-        line = None
+        lines = []
         if not invoice.company.currency.is_zero(amount):
-            line = invoice.pay_invoice(amount,
+            lines = invoice.pay_invoice(amount,
                 pay_payment_method, pay_date,
                 invoice.number, amount_second_currency,
                 second_currency)
 
         if remainder != Decimal('0.0'):
             return
-        else:
-            if line:
-                reconcile_lines += [line]
-            if reconcile_lines:
-                MoveLine.reconcile(reconcile_lines)
+        reconcile_lines += lines
+        if reconcile_lines:
+            MoveLine.reconcile(reconcile_lines)
 
 
 class Invoice(metaclass=PoolMeta):
@@ -147,12 +143,12 @@ class Invoice(metaclass=PoolMeta):
 
     collect_transactions = fields.One2Many('payment.collect.transaction',
         'invoice', "Collect Transactions", readonly=True)
-    paymode = fields.Many2One(
-        'payment.paymode',
-        'Pay mode', domain=[('party', '=', Eval('party', -1))],
+    paymode = fields.Many2One('payment.paymode', 'Pay mode',
+        domain=[('party', '=', Eval('party', -1))],
         states={
             'readonly': Not(Bool(Eval('state').in_(['draft', 'validated']))),
-        }, depends=['state', 'party'])
+            },
+        depends=['state', 'party'])
 
     @fields.depends('party', 'type')
     def on_change_with_paymode(self):
