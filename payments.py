@@ -10,7 +10,8 @@ from trytond.transaction import Transaction
 logger = logging.getLogger(__name__)
 
 
-class PaymentMixIn(object):
+class PaymentMixIn:
+    __slots__ = ()
 
     _EOL = '\r\n'
     _SEPARATOR = ';'
