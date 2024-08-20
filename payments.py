@@ -26,19 +26,16 @@ class PaymentMixIn:
     collect = None
     return_file = None
 
-    def attach_collect(self):
+    @classmethod
+    def attach_collect(cls, collect, res, filename):
         Attachment = Pool().get('ir.attachment')
-        if not self.collect:
-            collect = self.create_collect()
-        else:
-            collect = self.collect
         attach = Attachment()
-        attach.name = '%s' % self.filename
+        attach.name = filename
         attach.resource = collect
-        if self.res:
-            attach.data = ''.join(self.res).encode('utf8')
+        if res:
+            attach.data = ''.join(res).encode('utf8')
         else:
-            attach.data = self.return_file
+            attach.data = collect.return_file
         attach.save()
         return collect
 
@@ -61,18 +58,20 @@ class PaymentMixIn:
     def get_order(cls):
         return [('invoice_date', 'ASC'), ('id', 'ASC')]
 
-    def lista_campo_ordenados(self):
+    @classmethod
+    def lista_campo_ordenados(cls, linea):
         """ Devuelve lista de campos ordenados """
         return []
 
-    def a_texto(self, csv_format=False):
+    @classmethod
+    def a_texto(cls, linea, csv_format=False):
         """ Concatena los valores de los campos de la clase y los
         devuelve en una cadena de texto.
         """
-        campos = self.lista_campo_ordenados()
+        campos = cls.lista_campo_ordenados(linea)
         campos = [x for x in campos if x != '']
-        separador = csv_format and self._SEPARATOR or ''
-        return separador.join(campos) + self._EOL
+        separador = csv_format and cls._SEPARATOR or ''
+        return separador.join(campos) + cls._EOL
 
     @classmethod
     def message_invoice(cls, invoices, collect_result, message, pay_amount,
@@ -171,7 +170,9 @@ class PaymentMixIn:
         self.tabla_codigos = tabla_codigos
         return []
 
-    def get_format_date(self):
+    @classmethod
+    def get_format_date(cls):
+        "get_format_date"
         pool = Pool()
         Lang = pool.get('ir.lang')
         format_ = '%d/%m/%Y'
@@ -182,7 +183,9 @@ class PaymentMixIn:
         return (lambda value, format=None:
             value and es_419.strftime(value, format or format_) or '')
 
-    def get_format_number(self):
+    @classmethod
+    def get_format_number(cls):
+        "get_format_number"
         pool = Pool()
         Lang = pool.get('ir.lang')
         es_419 = Lang(
