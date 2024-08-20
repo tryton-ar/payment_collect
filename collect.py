@@ -125,10 +125,14 @@ class Collect(Workflow, ModelSQL, ModelView):
     def search_date(cls, name, clause):
         cursor = Transaction().connection.cursor()
         operator_ = clause[1:2][0]
+        value = clause[2:3][0]
+
+        if value is None:
+            return []
+
         cursor.execute('SELECT id '
-                'FROM "' + cls._table + '" '
-                'WHERE create_date' + operator_ + ' %s',
-                clause[2:3])
+                       'FROM "' + cls._table + '" '
+                       'WHERE create_date' + operator_ + ' ' + value)
         return [('id', 'in', [x[0] for x in cursor.fetchall()])]
 
     @classmethod
