@@ -21,32 +21,29 @@ class Collect(Workflow, ModelSQL, ModelView):
         (None, ''),
         ('send', 'Send'),
         ('return', 'Return'),
-        ], 'Type', readonly=True)
+        ], 'Type')
     date = fields.Function(fields.DateTime('Date'),
        'get_date', searcher='search_date')
-    paymode_type = fields.Char('Pay Mode', readonly=True)
-    monto_total = fields.Numeric('Monto total', digits=(16, 2),
-        readonly=True)
-    cantidad_registros = fields.Integer('Cantidad de registros',
-        readonly=True)
-    attachments = fields.One2Many('ir.attachment', 'resource', 'Attachments',
-        readonly=True)
+    paymode_type = fields.Char('Pay Mode')
+    monto_total = fields.Numeric('Monto total', digits=(16, 2))
+    cantidad_registros = fields.Integer('Cantidad de registros')
+    attachments = fields.One2Many('ir.attachment', 'resource', 'Attachments')
     transactions_accepted = fields.One2Many('payment.collect.transaction',
         'collect', 'Accepted transactions', filter=[
             ('collect_result', '=', 'A'),
             ('invoice', '!=', None),
-            ], readonly=True)
+            ])
     transactions_rejected = fields.One2Many('payment.collect.transaction',
         'collect', 'Rejected transactions', filter=[
             ('collect_result', '=', 'R'),
             ('invoice', '!=', None),
-            ], readonly=True)
+            ])
     apply_credit_to_invoices = fields.Many2Many(
         'payment.collect-account.move.line', 'collect', 'move_line',
-        'Apply Credit', readonly=True)
-    period = fields.Many2One('account.period', 'Period', readonly=True)
+        'Apply Credit')
+    period = fields.Many2One('account.period', 'Period')
     periods = fields.Many2Many('payment.collect-account.period',
-        'collect', 'period', 'Periods', readonly=True)
+        'collect', 'period', 'Periods')
     state = fields.Selection([
         ('invoicing', 'Invoicing'),
         ('processing', 'Processing'),
@@ -56,7 +53,7 @@ class Collect(Workflow, ModelSQL, ModelView):
         ('cancel', 'Cancelled'),
         ], 'State', readonly=True, required=True,
         states={'invisible': Eval('type') == 'send'})
-    create_invoices_button = fields.Boolean('Create invoices', readonly=True,
+    create_invoices_button = fields.Boolean('Create invoices',
         help='Check this box if you create invoices when process return.')
 
     @classmethod
