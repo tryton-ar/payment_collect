@@ -270,9 +270,9 @@ class CollectPeriod(ModelSQL):
     _table = 'collect_period_rel'
 
     collect = fields.Many2One('payment.collect', 'Collect',
-        ondelete='CASCADE', required=True, select=True)
+        ondelete='CASCADE', required=True)
     period = fields.Many2One('account.period', 'Period',
-        ondelete='CASCADE', required=True, select=True)
+        ondelete='CASCADE', required=True)
 
 
 class CollectMoveLine(ModelSQL):
@@ -281,9 +281,9 @@ class CollectMoveLine(ModelSQL):
     _table = 'collect_credit_account_move_line_rel'
 
     collect = fields.Many2One('payment.collect', 'Collect',
-        ondelete='CASCADE', required=True, select=True)
+        ondelete='CASCADE', required=True)
     move_line = fields.Many2One('account.move.line', 'Line',
-        ondelete='CASCADE', required=True, select=True)
+        ondelete='CASCADE', required=True)
 
 
 class CollectSendStart(ModelView):
@@ -358,7 +358,6 @@ class CollectReturnStart(ModelView):
         cls.periods.states.update({
             'invisible': Eval('paymode_type').in_(cls._paymode_types())
             })
-        cls.periods.depends += ['paymode_type']
 
     @staticmethod
     def default_create_invoices():

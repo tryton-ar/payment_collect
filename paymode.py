@@ -15,7 +15,7 @@ class PayMode(ModelSQL, ModelView):
     __name__ = 'payment.paymode'
 
     party = fields.Many2One('party.party', 'Party', ondelete='CASCADE',
-        required=True, select=True)
+        required=True)
     type = fields.Selection('get_origin', 'Type')
     # DEBIT
     cbu_number = fields.Char('CBU number')

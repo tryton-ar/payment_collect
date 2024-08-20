@@ -3,12 +3,14 @@
 # the full copyright notices and license terms.
 
 from trytond.pool import Pool
+
 from . import paymode
 from . import collect
 from . import invoice
 from . import party
 from . import configuration
 
+__all__ = ['register']
 
 def register():
     Pool.register(
