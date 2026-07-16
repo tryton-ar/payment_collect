@@ -1,3 +1,6 @@
+Version 8.0.0 - 2026-07-16
+* Migrate to Tryton 8.0 with hatch-tryton-ar build system
+
 Version 7.0.0 - 2024-08-20
 * Bug fixes (see git logs for details)
 
