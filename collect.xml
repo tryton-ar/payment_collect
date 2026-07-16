@@ -96,7 +96,7 @@ copyright notices and license terms. -->
         <record model="ir.model.button" id="payment_collect_post_invoices_button">
             <field name="name">post_invoices</field>
             <field name="string">Post Invoices</field>
-            <field name="model" search="[('model', '=', 'payment.collect')]"/>
+            <field name="model">payment.collect</field>
         </record>
         <record model="ir.model.button-res.group"
             id="payment_collect_post_inovices_button_group_account">
@@ -107,7 +107,7 @@ copyright notices and license terms. -->
         <record model="ir.model.button" id="payment_collect_pay_invoices_button">
             <field name="name">pay_invoices</field>
             <field name="string">Pay Invoices</field>
-            <field name="model" search="[('model', '=', 'payment.collect')]"/>
+            <field name="model">payment.collect</field>
         </record>
         <record model="ir.model.button-res.group"
             id="payment_collect_pay_inovices_button_group_account">
@@ -118,7 +118,7 @@ copyright notices and license terms. -->
         <record model="ir.model.button" id="payment_collect_create_invoices_button">
             <field name="name">create_invoices</field>
             <field name="string">Create Invoices</field>
-            <field name="model" search="[('model', '=', 'payment.collect')]"/>
+            <field name="model">payment.collect</field>
         </record>
         <record model="ir.model.button-res.group"
             id="payment_collect_create_inovices_button_group_account">
