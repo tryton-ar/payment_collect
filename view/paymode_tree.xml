@@ -2,4 +2,5 @@
 <tree>
     <field name="party"/>
     <field name="type"/>
+    <field name="cbu_number"/>
 </tree>
