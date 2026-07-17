@@ -43,11 +43,9 @@ class PayMode(ModelSQL, ModelView):
     @classmethod
     def get_origin(cls):
         Model = Pool().get('ir.model')
+        get_name = Model.get_name
         models = cls._get_origin()
-        models = Model.search([
-            ('model', 'in', models),
-            ])
-        return [(None, '')] + [(m.model, m.name) for m in models]
+        return [(None, '')] + [(m, get_name(m)) for m in models]
 
     def get_rec_name(self, name):
         if self.type and self.party:
