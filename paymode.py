@@ -48,9 +48,10 @@ class PayMode(ModelSQL, ModelView):
         return [(None, '')] + [(m, get_name(m)) for m in models]
 
     def get_rec_name(self, name):
+        Model = Pool().get('ir.model')
+        get_name = Model.get_name
         if self.type and self.party:
-            return '[%s] %s' % (Pool().get(self.type).__doc__,
-                self.party.rec_name)
+            return '[%s] %s' % (get_name(self.type), self.party.rec_name)
         return name
 
     @classmethod
