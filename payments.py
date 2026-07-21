@@ -142,12 +142,10 @@ class PaymentMixIn:
     def create_collect(self):
         pool = Pool()
         Collect = pool.get('payment.collect')
-        Model = pool.get('ir.model')
 
-        model, = Model.search([('model', '=', self.__name__)])
         collect = Collect()
         collect.type = self.type
-        collect.paymode_type = model.name
+        collect.paymode_type = type(self).__name__  # e.g. 'PayModeBccl'
         collect.cantidad_registros = self.cantidad_registros
         collect.monto_total = self.monto_total
         if self.periods:
