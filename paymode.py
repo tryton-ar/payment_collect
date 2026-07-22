@@ -69,6 +69,6 @@ class PayMode(ModelSQL, ModelView):
     def pre_validate(self):
         super().pre_validate()
         if (self.type == 'payment.paymode.bccl' and self.bank_account and not
-                cbu.is_valid(self.bank_account.rec_name)):
+                cbu.is_valid(self.bank_account.get_cbu_number())):
             raise UserError(gettext('payment_collect.msg_invalid_cbu',
                     self.bank_account.rec_name))
