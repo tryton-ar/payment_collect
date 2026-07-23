@@ -139,33 +139,8 @@ class PaymentMixIn:
             if reconcile_lines:
                 MoveLine.reconcile(reconcile_lines)
 
-    def create_collect(self):
-        pool = Pool()
-        Collect = pool.get('payment.collect')
-
-        collect = Collect()
-        collect.type = self.type
-        collect.paymode_type = type(self).__name__  # e.g. 'PayModeBccl'
-        collect.cantidad_registros = self.cantidad_registros
-        collect.monto_total = self.monto_total
-        if self.periods:
-            collect.periods = self.periods
-        collect.save()
-        self.collect = collect
-        return collect
-
-    def return_collect(self, start, tabla_codigos={}):
-        self.type = 'return'
-        self.return_file = start.return_file
-        if hasattr(start, 'periods'):
-            self.periods = start.periods
-        self.create_collect()
-        self.invoices_id = {
-            'accepted_invoices': [],
-            'rejected_invoices': [],
-            }
-        self.codigo_retorno = {}
-        self.tabla_codigos = tabla_codigos
+    @classmethod
+    def return_collect(cls, start, tabla_codigos={}):
         return []
 
     @classmethod
