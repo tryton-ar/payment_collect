@@ -49,27 +49,28 @@ class CollectTransaction(ModelSQL, ModelView):
         table.drop_column('journal')
 
     def get_party(self, name):
-        if hasattr(self.invoice, 'party'):
+        if self.invoice and self.invoice.party:
             return self.invoice.party.id
         return None
 
     def get_party_contact(self, name):
-        if hasattr(self.invoice, 'party'):
-            return self.invoice.party.get_mechanism(name)
+        if self.invoice and self.invoice.party:
+            contact = self.invoice.party.contact_mechanism_get(name)
+            return contact.value if contact else ''
         return ''
 
     def get_invoice_state(self, name):
-        if hasattr(self.invoice, 'state'):
+        if self.invoice and self.invoice.state:
             return self.invoice.state
         return None
 
     def get_invoice_date(self, name):
-        if hasattr(self.invoice, 'invoice_date'):
+        if self.invoice and self.invoice.invoice_date:
             return self.invoice.invoice_date
         return None
 
     def get_invoice_amount(self, name):
-        if hasattr(self.invoice, 'total_amount'):
+        if self.invoice and self.invoice.total_amount:
             return self.invoice.total_amount
         return None
 
